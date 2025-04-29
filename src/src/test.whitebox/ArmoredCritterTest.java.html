@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ArmoredCritterTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 25, 2025 2:18:13 AM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">test.whitebox</a> &gt; <span class="el_source">ArmoredCritterTest.java</span></div><h1>ArmoredCritterTest.java</h1><pre class="source lang-java linenums">package test.whitebox;
+import org.junit.jupiter.api.BeforeEach;
+import static org.junit.jupiter.api.Assertions.*;
+import java.util.Queue;
+
+import org.junit.jupiter.api.Test;
+
+<span class="fc" id="L8">class ArmoredCritterTest {</span>
+
+    private critters.ArmoredCritter critter;
+    private int[][] path;
+
+    @BeforeEach
+    void setUp() {
+<span class="fc" id="L15">        path = new int[][]{{0, 0}, {10, 0}, {10, 10}};</span>
+<span class="fc" id="L16">        critter = new critters.ArmoredCritter(path);</span>
+<span class="fc" id="L17">    }</span>
+    // --- Basic unit tests ---
+
+    @Test
+    void testName() {
+<span class="fc" id="L22">        assertEquals(&quot;Armored&quot;, critter.getName());</span>
+<span class="fc" id="L23">    }</span>
+
+    @Test
+    void testInitialHealth() {
+<span class="fc" id="L27">        assertEquals(2.0, critter.getHealth());</span>
+<span class="fc" id="L28">    }</span>
+
+    @Test
+    void testInitialReward() {
+<span class="fc" id="L32">        assertEquals(60, critter.getReward());</span>
+<span class="fc" id="L33">    }</span>
+
+    @Test
+    void testInitialSpeed() {
+<span class="fc" id="L37">        assertEquals(0.8, critter.getSpeed());</span>
+<span class="fc" id="L38">    }</span>
+
+    @Test
+    void testInitialArmor() {
+        // indirect check via takeDamage
+<span class="fc" id="L43">        critter.takeDamage(8);</span>
+<span class="fc" id="L44">        assertEquals(1.0, critter.getHealth());</span>
+<span class="fc" id="L45">    }</span>
+
+    @Test
+    void testInitialAliveState() {
+<span class="fc" id="L49">        assertTrue(critter.isAlive());</span>
+<span class="fc" id="L50">    }</span>
+
+    @Test
+    void testInitialVisibility() {
+<span class="fc" id="L54">        assertFalse(critter.isVisible());</span>
+<span class="fc" id="L55">    }</span>
+
+    @Test
+    void testCritterType() {
+<span class="fc" id="L59">        assertEquals(critters.Critter.type.ARMORED, critter.getType());</span>
+<span class="fc" id="L60">    }</span>
+
+    // --- Movement tests ---
+
+    @Test
+    void testMoveOnceChangesPositionAndDirection() {
+<span class="fc" id="L66">        float xBefore = critter.getXLoc();</span>
+<span class="fc" id="L67">        critter.move();</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">        assertTrue(critter.getXLoc() &gt; xBefore);</span>
+<span class="fc" id="L69">        assertEquals(critters.Critter.direction.RIGHT, critter.getCritterDirection());</span>
+<span class="fc" id="L70">    }</span>
+
+    @Test
+    void testDistanceTravelledAfterMove() {
+<span class="fc" id="L74">        double before = critter.getDistanceTravelled();</span>
+<span class="fc" id="L75">        critter.move();</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        assertTrue(critter.getDistanceTravelled() &gt; before);</span>
+<span class="fc" id="L77">    }</span>
+
+    @Test
+    void testAtEndPointAfterFullPath() {
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        for (int i = 0; i &lt; 100; i++) critter.move();</span>
+<span class="fc" id="L82">        assertTrue(critter.isAtEndPoint());</span>
+<span class="fc" id="L83">    }</span>
+
+    @Test
+    void testMoveSetsVisibleTrue() {
+<span class="fc" id="L87">        assertFalse(critter.isVisible());</span>
+<span class="fc" id="L88">        critter.move();</span>
+<span class="fc" id="L89">        assertTrue(critter.isVisible());</span>
+<span class="fc" id="L90">    }</span>
+
+    @Test
+    void testInvalidPathTriggersEndPoint() {
+<span class="fc" id="L94">        int[][] shortPath = {{0, 0}};</span>
+<span class="fc" id="L95">        critters.ArmoredCritter shortCritter = new critters.ArmoredCritter(shortPath);</span>
+<span class="fc" id="L96">        shortCritter.move(); // No second point, expect IndexOutOfBounds</span>
+<span class="fc" id="L97">        assertTrue(shortCritter.isAtEndPoint());</span>
+<span class="fc" id="L98">        assertFalse(shortCritter.isVisible());</span>
+<span class="fc" id="L99">    }</span>
+    // --- Damage tests ---
+
+    @Test
+    void testTakeDamageWithArmor() {
+<span class="fc" id="L104">        critter.takeDamage(8);</span>
+<span class="fc" id="L105">        assertEquals(1.0, critter.getHealth());</span>
+<span class="fc" id="L106">    }</span>
+
+    @Test
+    void testTakeDamageKillsCritter() {
+<span class="fc" id="L110">        critter.takeDamage(100); // more than health * armor</span>
+<span class="fc" id="L111">        assertFalse(critter.isAlive());</span>
+<span class="fc" id="L112">        assertFalse(critter.isVisible());</span>
+<span class="fc" id="L113">    }</span>
+
+    @Test
+    void testTakeZeroDamage() {
+<span class="fc" id="L117">        double before = critter.getHealth();</span>
+<span class="fc" id="L118">        critter.takeDamage(0);</span>
+<span class="fc" id="L119">        assertEquals(before, critter.getHealth());</span>
+<span class="fc" id="L120">    }</span>
+
+    @Test
+    void testTakeNegativeDamageNoHeal() {
+<span class="fc" id="L124">        double before = critter.getHealth();</span>
+<span class="fc" id="L125">        critter.takeDamage(-10);</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">        assertTrue(critter.getHealth() &gt; before); // Armor makes negative damage look like healing</span>
+        // This is potentially a logic bug in the original code!
+<span class="fc" id="L128">    }</span>
+
+    // --- Freeze tests ---
+
+    @Test
+    void testFreezeReducesSpeed() {
+<span class="fc" id="L134">        critter.freezeCritter();</span>
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">        assertTrue(critter.getSpeed() &lt; 0.8);</span>
+<span class="fc" id="L136">    }</span>
+
+    @Test
+    void testUnfreezeRestoresSpeed() {
+<span class="fc" id="L140">        critter.freezeCritter();</span>
+<span class="fc" id="L141">        critter.unfreezeCritter();</span>
+<span class="fc" id="L142">        assertEquals(0.8, critter.getSpeed());</span>
+<span class="fc" id="L143">    }</span>
+
+    @Test
+    void testFreezeDurationExpires() throws InterruptedException {
+<span class="fc" id="L147">        critter.setFreezeDuration(100);</span>
+<span class="fc" id="L148">        critter.freezeCritter();</span>
+<span class="fc" id="L149">        Thread.sleep(200);</span>
+<span class="fc" id="L150">        critter.move(); // triggers unfreeze</span>
+<span class="fc" id="L151">        assertEquals(0.8, critter.getSpeed());</span>
+<span class="fc" id="L152">    }</span>
+
+    @Test
+    void testSetNegativeFreezeDuration() {
+<span class="fc" id="L156">        critter.setFreezeDuration(-1000);</span>
+        // no assertion since freezeDuration is private, but should not crash
+<span class="fc" id="L158">    }</span>
+
+    // --- Logic consistency ---
+
+    @Test
+    void testDirectionChangesCorrectly() {
+<span class="fc bfc" id="L164" title="All 2 branches covered.">        for (int i = 0; i &lt; 20; i++) critter.move();</span>
+<span class="fc" id="L165">        assertNotNull(critter.getCritterDirection());</span>
+<span class="fc" id="L166">    }</span>
+
+    @Test
+    void testCanMoveInitiallyTrue() {
+<span class="fc" id="L170">        assertTrue(critter.CanMove());</span>
+<span class="fc" id="L171">    }</span>
+    // === Fault-Revealing Test: Division by armor ===
+
+    @Test
+    void testTakeDamageDoesNotKillTooEarly() {
+<span class="fc" id="L176">    	critter.takeDamage(8); // 8 / 8 = 1, HP 2 → 1</span>
+<span class="fc" id="L177">        assertTrue(critter.isAlive());</span>
+<span class="fc" id="L178">        assertEquals(1.0, critter.getHealth(), 0.01);</span>
+<span class="fc" id="L179">    }</span>
+
+    @Test
+    void testTakeExactDamageKills() {
+<span class="fc" id="L183">    	critter.takeDamage(16); // 16 / 8 = 2 == HP</span>
+<span class="fc" id="L184">        assertFalse(critter.isAlive());</span>
+<span class="fc" id="L185">    }</span>
+
+    @Test
+    void testTakeNegativeDamageIncreasesHealth() {
+<span class="fc" id="L189">        double before = critter.getHealth();</span>
+<span class="fc" id="L190">        critter.takeDamage(-8); // -8 / 8 = -1 → HP increases!</span>
+<span class="pc bpc" id="L191" title="1 of 2 branches missed.">        assertTrue(critter.getHealth() &gt; before);</span>
+
+        // ⚠️ 设计缺陷：应防止负伤害变成“回血”效果
+<span class="fc" id="L194">    }</span>
+
+    @Test
+    void testCreateQueueIncludesArmoredCritter() {
+<span class="fc" id="L198">        int[][] path = {</span>
+<span class="fc" id="L199">            {0, 0}, {5, 0}, {5, 5}</span>
+        };
+
+<span class="fc" id="L202">        critters.CritterGenerator generator = new critters.CritterGenerator(path, 5);</span>
+<span class="fc" id="L203">        generator.createCritterQueue();</span>
+<span class="fc" id="L204">        Queue&lt;critters.Critter&gt; queue = generator.getCritterQueue();</span>
+
+<span class="fc" id="L206">        boolean foundArmored = queue.stream().anyMatch(c -&gt; c instanceof critters.ArmoredCritter);</span>
+<span class="fc" id="L207">        assertTrue(foundArmored);</span>
+<span class="fc" id="L208">    }</span>
+
+    @Test
+    void testArmoredInQueueIsAliveAndVisibleAfterMove() {
+<span class="fc" id="L212">        int[][] path = {</span>
+<span class="fc" id="L213">            {0, 0}, {2, 0}, {4, 0}, {6, 0}</span>
+        };
+
+<span class="fc" id="L216">        critters.ArmoredCritter critter = new critters.ArmoredCritter(path);</span>
+<span class="fc bfc" id="L217" title="All 2 branches covered.">        for (int i = 0; i &lt; 10; i++) critter.move();</span>
+
+<span class="fc" id="L219">        assertTrue(critter.isAlive());</span>
+<span class="pc bpc" id="L220" title="3 of 4 branches missed.">        assertTrue(critter.isVisible() || critter.isAtEndPoint());</span>
+<span class="fc" id="L221">    }</span>
+
+    @Test
+    void testAllCrittersCanMoveAndTakeDamage() {
+<span class="fc" id="L225">        int[][] path = {</span>
+<span class="fc" id="L226">            {0, 0}, {2, 0}, {4, 0}</span>
+        };
+
+<span class="fc" id="L229">        critters.CritterGenerator generator = new critters.CritterGenerator(path, 5);</span>
+<span class="fc" id="L230">        generator.createCritterQueue();</span>
+
+<span class="pc bpc" id="L232" title="1 of 2 branches missed.">        for (critters.Critter c : generator.getCritterQueue()) {</span>
+<span class="fc" id="L233">            c.move();</span>
+<span class="fc" id="L234">            c.takeDamage(100);</span>
+<span class="fc" id="L235">            assertFalse(c.isAlive()); </span>
+        }
+<span class="nc" id="L237">    }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 25, 2025 2:18:13 AM)</div></body></html>

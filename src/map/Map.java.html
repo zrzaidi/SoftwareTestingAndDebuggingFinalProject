@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>Map.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 28, 2025 8:22:47 PM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">map</a> &gt; <span class="el_source">Map.java</span></div><h1>Map.java</h1><pre class="source lang-java linenums">package map;
+
+import grid.*;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+
+/**
+ * @author		Wei Wang
+ * @version		1.0
+ * @since		2015-02-28
+ */
+
+public class Map {
+
+	private int widthOfMap, heightOfMap;
+	private Tile[][] mapTile;
+	private String inputCorner;
+	private PathTile entry;
+	private int[][] mapArray;
+	private int[][] cornerArray;
+	
+	private static final int CELL_SIZE = 32;
+
+	private boolean validityOfMap, validityOfPath;
+
+	/**
+	 * Map design
+	 * 
+	 * @param widthOfMap 	The horizontal number of MapTile (x-axis)
+	 * @param heightOfMap	The vertical number of MapTile (y-axis)
+	 */
+	public Map(){
+<span class="fc" id="L35">		super();</span>
+
+<span class="fc" id="L37">		this.widthOfMap = 0;</span>
+<span class="fc" id="L38">		this.heightOfMap = 0;</span>
+<span class="fc" id="L39">		this.inputCorner = &quot;&quot;;</span>
+		
+<span class="fc" id="L41">		validityOfMap = true;</span>
+<span class="fc" id="L42">	}</span>
+
+	/**
+	 * Set Map size
+	 * 
+	 * @param widthOfMap	horizontal number of MapTile 
+	 * @param heightOfMap	vertical number of MapTile
+	 */
+	public void setMapSize(int widthOfMap, int heightOfMap){
+<span class="fc" id="L51">		this.widthOfMap = widthOfMap;</span>
+<span class="fc" id="L52">		this.heightOfMap = heightOfMap;</span>
+<span class="fc" id="L53">	}</span>
+	
+	/**
+	 * Set Several Points on the path including entry and exit
+	 * 
+	 * @param inputCorner
+	 */
+	public void setInputCorner(String inputCorner){
+<span class="fc" id="L61">		this.inputCorner = inputCorner;</span>
+<span class="fc" id="L62">	}</span>
+	
+	/**
+	 * Initialize the Map and set it as default type
+	 * 
+	 * @param mapTile	map grid
+	 */
+	public void initializeMap(){
+<span class="pc bpc" id="L70" title="1 of 4 branches missed.">		if (widthOfMap &gt; 0 &amp;&amp; heightOfMap &gt; 0){</span>
+<span class="fc" id="L71">			mapTile = new Tile[widthOfMap][heightOfMap];</span>
+
+<span class="fc bfc" id="L73" title="All 2 branches covered.">			for (int i = 0 ; i &lt; widthOfMap; i++){</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">				for (int j = 0; j &lt; heightOfMap; j++){</span>
+<span class="fc" id="L75">					mapTile[i][j] = new MapTile(i,j);</span>
+				}
+			}		
+		}
+<span class="fc" id="L79">		validityOfMap = true;</span>
+<span class="fc" id="L80">	}</span>
+
+	/**
+	 * 
+	 * @return the width of Map
+	 */
+	public int getWidthOfMap(){
+<span class="fc" id="L87">		return widthOfMap;</span>
+	}
+	
+	/**
+	 * 
+	 * @return width in pixel
+	 */
+	public int getWidthInPixel(){
+<span class="fc" id="L95">		return widthOfMap * CELL_SIZE;</span>
+	}
+
+	/**
+	 * 
+	 * @return the height of Map
+	 */
+	public int getHeightOfMap(){
+<span class="fc" id="L103">		return heightOfMap;</span>
+	}
+	
+	public int getHeightInPixel(){
+<span class="fc" id="L107">		return heightOfMap * CELL_SIZE;</span>
+	}
+	 
+	/**
+	 * 
+	 * @return	user's input of path
+	 */
+	public String getInputCorner(){
+<span class="fc" id="L115">		return inputCorner;</span>
+	}
+
+	/**
+	 * Retrieve the MapTile
+	 * 
+	 * @param x		X-coordinate
+	 * @param y		Y-coordinate
+	 * @return		the content of MapTile
+	 */
+	public Tile getTile(int x, int y){
+		try {
+<span class="fc" id="L127">			return this.mapTile[x][y];</span>
+<span class="fc" id="L128">		} catch(Exception e){</span>
+
+		}
+<span class="fc" id="L131">		return null;</span>
+	}
+	
+	/**
+	 * 
+	 * @return  cell size in pixel
+	 */
+	public int getPixelSize(){
+<span class="fc" id="L139">		return CELL_SIZE;</span>
+	}
+	
+	/**
+	 * Place Entry Point on Map and change the tile's type  to Entry
+	 * 
+	 * @param x		X-coordinate of Entry point
+	 * @param y		Y-coordinate of Entry point
+	 */
+	public void placeEntry(int x, int y){
+<span class="fc" id="L149">		mapTile[x][y] = new PathTile(x, y);</span>
+<span class="fc" id="L150">		mapTile[x][y].setType(2);</span>
+<span class="fc" id="L151">		entry = (PathTile) mapTile[x][y];</span>
+<span class="fc" id="L152">	}</span>
+
+	/**
+	 * 
+	 * @return entry point
+	 */
+	public PathTile getEntry(){
+<span class="fc" id="L159">		return (PathTile) this.getTile(entry.getX(), entry.getY());</span>
+	}
+
+	/**
+	 * Place Exit point on Map and change the tile's type to Exit
+	 * 
+	 * @param x		X-coordinate of Exit point
+	 * @param y		Y-coordinate of Exit point
+	 */
+	public void placeExit(int x, int y){
+<span class="fc" id="L169">		mapTile[x][y] = new PathTile(x, y);</span>
+<span class="fc" id="L170">		mapTile[x][y].setType(3);</span>
+<span class="fc" id="L171">	}</span>
+
+	/**
+	 * Place the path point on the Map
+	 * Be Careful, the point must exist on the map
+	 * 
+	 * @param x		X-coordinate of assigned PathTile
+	 * @param y		Y-coordinate of assigned PathTile
+	 */
+	public void placePathPoint(int x, int y){
+<span class="fc bfc" id="L181" title="All 2 branches covered.">		if (mapTile[x][y] instanceof MapTile){</span>
+<span class="fc" id="L182">			mapTile[x][y] = new PathTile(x, y);</span>
+		}
+<span class="fc" id="L184">	}</span>
+	
+	public String arrangePathPoint(ArrayList&lt;Integer&gt; pathPoints){
+<span class="fc" id="L187">		String temp = &quot;&quot;;</span>
+<span class="fc bfc" id="L188" title="All 2 branches covered.">		for (int i = 0 ; i &lt; pathPoints.size(); i+=2){</span>
+<span class="fc" id="L189">			temp += &quot;(&quot; + pathPoints.get(i) + &quot;,&quot; + pathPoints.get(i + 1) + &quot;) &quot;;</span>
+		}
+
+<span class="fc" id="L192">		inputCorner = temp.substring(0);</span>
+		
+<span class="fc" id="L194">		return inputCorner;</span>
+	}
+
+	/**
+	 * Read multiple xy-coordinates from a string which is required at least two sets
+	 * Split the coordinates and insert them into a queue
+	 * 
+	 * @param s		a set of PathTile inputs as a string
+	 * @return all path coordinates in a Queue
+	 */
+	public Queue&lt;PathTile&gt; multipleCoordinatesSplit(String s){
+<span class="fc" id="L205">		inputCorner = s.substring(0);</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">		if (inputCorner.isEmpty()){</span>
+<span class="fc" id="L207">			return null;</span>
+		}
+
+<span class="fc" id="L210">		Queue&lt;PathTile&gt; path = new LinkedList&lt;PathTile&gt;();</span>
+<span class="fc" id="L211">		String[] arr = s.split(&quot;\\)\\s*&quot;); </span>
+<span class="fc bfc" id="L212" title="All 2 branches covered.">		for (String anArr : arr){</span>
+<span class="fc" id="L213">			String x = anArr.substring(1,anArr.indexOf(&quot;,&quot;)).trim();</span>
+<span class="fc" id="L214">			String y = anArr.substring(anArr.indexOf(&quot;,&quot;) + 1, anArr.length()).trim();</span>
+
+<span class="fc" id="L216">			PathTile p = new PathTile(Integer.valueOf(x), Integer.valueOf(y));</span>
+<span class="fc" id="L217">			path.add(p);</span>
+		}
+<span class="fc" id="L219">		return path;</span>
+	}
+	
+	/**
+	 * Convert the corners on the path into 2D array including entry and exit
+	 * 
+	 * @param path
+	 * @return cornerArray
+	 */
+	public int[][] cornerArray(Queue&lt;PathTile&gt; path){
+<span class="fc" id="L229">		ArrayList&lt;Integer&gt; array = new ArrayList&lt;Integer&gt;();</span>
+		
+<span class="fc bfc" id="L231" title="All 2 branches covered.">		while (!path.isEmpty()){</span>
+<span class="fc" id="L232">			PathTile current = path.poll();</span>
+<span class="fc" id="L233">			array.add(current.getX());</span>
+<span class="fc" id="L234">			array.add(current.getY());</span>
+		}
+		
+<span class="fc" id="L237">		int arraySize = array.size() / 2;</span>
+<span class="fc" id="L238">		int count = 0;</span>
+		
+<span class="fc" id="L240">		cornerArray = new int[arraySize][2];</span>
+<span class="fc bfc" id="L241" title="All 2 branches covered.">		for (int i = 0; i &lt; arraySize; i ++){</span>
+<span class="pc bpc" id="L242" title="1 of 2 branches missed.">			if (count == array.size()){</span>
+<span class="nc" id="L243">				break;</span>
+			}
+
+<span class="fc" id="L246">			cornerArray[i][0] = array.get(count) * getPixelSize() + getPixelSize() / 2;</span>
+<span class="fc" id="L247">			cornerArray[i][1] = array.get(count + 1) * getPixelSize() + getPixelSize() / 2;</span>
+
+<span class="fc bfc" id="L249" title="All 2 branches covered.">			if (count == 0){</span>
+<span class="fc bfc" id="L250" title="All 2 branches covered.">				if (array.get(count) == 0){</span>
+<span class="fc" id="L251">					cornerArray[0][0] = array.get(count) * getPixelSize();</span>
+				}
+<span class="fc bfc" id="L253" title="All 2 branches covered.">				if (array.get(count) == getWidthOfMap() - 1){</span>
+<span class="fc" id="L254">					cornerArray[0][0] = (array.get(count) + 1) * getPixelSize();</span>
+				}
+<span class="fc bfc" id="L256" title="All 2 branches covered.">				if (array.get(count + 1) == 0){</span>
+<span class="fc" id="L257">					cornerArray[0][1] = array.get(count + 1) * getPixelSize() + getPixelSize() / 2;</span>
+				}
+			}
+<span class="fc" id="L260">			count+= 2;</span>
+		}
+
+<span class="fc" id="L263">		return cornerArray;</span>
+	}
+	
+	/**
+	 * 
+	 * @return  cornerArray
+	 */
+	public int[][] getCornersList(){
+<span class="fc" id="L271">		return cornerArray;</span>
+	}
+
+	/**
+	 * Link all the path tile together
+	 * First input is an Entry point
+	 * Last input is an Exit point
+	 * 
+	 * @param newPath		a Queue contains all the path locations
+	 */
+	public void buildPath(Queue &lt;PathTile&gt; newPath){
+<span class="fc bfc" id="L282" title="All 2 branches covered.">		if (newPath == null){</span>
+<span class="fc" id="L283">			return;</span>
+		}
+
+		//Store the first input coordinate values
+<span class="fc" id="L287">		entry = newPath.peek();</span>
+		PathTile current, next;
+
+<span class="fc bfc" id="L290" title="All 2 branches covered.">		if (newPath.isEmpty()){</span>
+<span class="fc" id="L291">			return;</span>
+		}
+
+<span class="fc" id="L294">		if (newPath.size() &gt;= 2){</span>
+		}		
+				
+<span class="fc" id="L297">		current = newPath.remove();</span>
+<span class="fc" id="L298">		next = current;</span>
+
+<span class="pc bpc" id="L300" title="1 of 4 branches missed.">		if (current.getX() &lt; getWidthOfMap() &amp;&amp; current.getY() &lt; getHeightOfMap()){</span>
+<span class="fc" id="L301">			mapTile[next.getX()][next.getY()] = new PathTile(next.getX(), next.getY());</span>
+
+<span class="fc bfc" id="L303" title="All 2 branches covered.">			while (!newPath.isEmpty()){</span>
+<span class="fc" id="L304">				next = newPath.remove();</span>
+<span class="fc" id="L305">				linkTwoPoints(current, next);</span>
+<span class="fc" id="L306">				current = next;</span>
+			}
+
+			//Indicates the Entry and Exit of the path
+<span class="fc" id="L310">			placeEntry(entry.getX(), entry.getY());</span>
+<span class="fc" id="L311">			placeExit(current.getX(), current.getY());</span>
+
+		}
+<span class="fc" id="L314">	}</span>
+
+	/**
+	 * Link the path from a specific PathTile to another one
+	 * Two points must have to share the same x position or y position
+	 * If two points have the same x-coordinate, then create a vertical line to connect them together
+	 * Otherwise, create a horizontal line
+	 * 
+	 * @param startPoint	The first point (From this PathTile)
+	 * @param endPoint		The second point (To this PathTile)
+	 */
+	public void linkTwoPoints(PathTile startPoint, PathTile endPoint){
+		int dx, dy;
+
+<span class="fc" id="L328">		int x1 = startPoint.getX();</span>
+<span class="fc" id="L329">		int y1 = startPoint.getY();</span>
+
+<span class="fc" id="L331">		int x2 = endPoint.getX();</span>
+<span class="fc" id="L332">		int y2 = endPoint.getY();</span>
+
+<span class="fc bfc" id="L334" title="All 4 branches covered.">		if (x1 != x2 &amp;&amp; y1 != y2){</span>
+<span class="fc" id="L335">			placePathPoint(x1, y1);</span>
+<span class="fc" id="L336">			placePathPoint(x2, y2);</span>
+
+<span class="pc bpc" id="L338" title="4 of 8 branches missed.">			if (x1 == 0 || x1 == getWidthOfMap() - 1 || y1 == 0 || y1 == getHeightOfMap() - 1){</span>
+<span class="nc" id="L339">				validityOfPath = true;</span>
+			}
+<span class="pc bpc" id="L341" title="4 of 8 branches missed.">			if (x2 == 0 || x2 == getWidthOfMap() - 1 || y2 == 0 || y2 == getHeightOfMap() - 1){</span>
+<span class="nc" id="L342">				validityOfPath = true;</span>
+			}
+<span class="nc" id="L344">		}</span>
+		else {
+
+<span class="fc" id="L347">			PathTile currentPoint = (PathTile) mapTile[x1][y1];</span>
+
+			//If two inputs have the same x-axis, calculate the different of y and create a vertical line to connect two points
+<span class="fc bfc" id="L350" title="All 2 branches covered.">			if (x1 == x2){</span>
+<span class="fc" id="L351">				dy = y2 - y1;</span>
+
+<span class="fc bfc" id="L353" title="All 2 branches covered.">				if (dy == 0){</span>
+<span class="fc" id="L354">					return;</span>
+				}
+				//If the difference is positive, link them from bottom to top
+				//Otherwise, link them from top to bottom
+<span class="fc bfc" id="L358" title="All 2 branches covered.">				else if (dy &gt; 0){</span>
+<span class="fc bfc" id="L359" title="All 2 branches covered.">					for (int i = 1 ; i &lt;= dy; i++){</span>
+<span class="fc" id="L360">						mapTile[x1][y1 + i] = new PathTile(x1, y1 + i);</span>
+<span class="fc" id="L361">						currentPoint.setNextTile((PathTile)mapTile[x1][y1 + i]);</span>
+<span class="fc" id="L362">						currentPoint = (PathTile)mapTile[x1][y1 + i];</span>
+					}
+<span class="fc" id="L364">				}</span>
+				else {
+<span class="fc bfc" id="L366" title="All 2 branches covered.">					for (int i = -1 ; i &gt;= dy; i--){</span>
+<span class="fc" id="L367">						mapTile[x1][y1 + i] = new PathTile(x1, y1 + i);</span>
+<span class="fc" id="L368">						currentPoint.setNextTile((PathTile)mapTile[x1][y1 + i]);</span>
+<span class="fc" id="L369">						currentPoint = (PathTile)mapTile[x1][y1 + i];</span>
+					}
+				}
+<span class="fc" id="L372">				validityOfPath = true;</span>
+<span class="fc" id="L373">			}</span>
+			//If two inputs have the same y-axis, calculate the different of x and create a horizontal line to connect two points
+<span class="pc bpc" id="L375" title="1 of 2 branches missed.">			else if (y1 == y2){</span>
+<span class="fc" id="L376">				dx = x2 - x1;</span>
+
+<span class="pc bpc" id="L378" title="1 of 2 branches missed.">				if (dx == 0){</span>
+<span class="nc" id="L379">					return;</span>
+				}
+				//If the difference is positive, link them from left to right
+				//Otherwise, link them from right to left
+<span class="fc bfc" id="L383" title="All 2 branches covered.">				else if (dx &gt; 0){</span>
+<span class="fc bfc" id="L384" title="All 2 branches covered.">					for (int i = 1 ; i &lt;= dx; i++){</span>
+<span class="fc" id="L385">						mapTile[x1 + i][y1] = new PathTile(x1 + i, y1);</span>
+<span class="fc" id="L386">						currentPoint.setNextTile((PathTile)mapTile[x1 + i][y1]);</span>
+<span class="fc" id="L387">						currentPoint = (PathTile)mapTile[x1 + i][y1];</span>
+					}
+<span class="fc" id="L389">				}</span>
+				else {
+<span class="fc bfc" id="L391" title="All 2 branches covered.">					for (int i = -1 ; i &gt;= dx; i--){</span>
+<span class="fc" id="L392">						mapTile[x1 + i][y1] = new PathTile(x1 + i, y1);</span>
+<span class="fc" id="L393">						currentPoint.setNextTile((PathTile)mapTile[x1 + i][y1]);</span>
+<span class="fc" id="L394">						currentPoint = (PathTile)mapTile[x1 + i][y1];</span>
+					}
+				}
+<span class="fc" id="L397">				validityOfPath = true;</span>
+			}
+		}
+<span class="fc" id="L400">	}</span>
+	
+	/**
+	 * Convert the object Map to 2D integer array version
+	 * 
+	 * @param map
+	 * @return
+	 */
+	public int[][] convertToBinaryMap(Map map){
+<span class="fc" id="L409">		mapArray = new int[map.getHeightOfMap()][map.getWidthOfMap()];</span>
+		
+<span class="fc bfc" id="L411" title="All 2 branches covered.">		for (int j = 0; j &lt; map.getHeightOfMap(); j++){</span>
+<span class="fc bfc" id="L412" title="All 2 branches covered.">			for (int i = 0; i &lt; map.getWidthOfMap(); i++){</span>
+<span class="fc bfc" id="L413" title="All 2 branches covered.">				if (map.getTile(i, j) instanceof PathTile){</span>
+<span class="fc bfc" id="L414" title="All 2 branches covered.">					if (map.getTile(i, j).getType() == 2){</span>
+<span class="fc" id="L415">						mapArray[j][i] = 2;</span>
+<span class="fc" id="L416">					}</span>
+<span class="fc bfc" id="L417" title="All 2 branches covered.">					else if (map.getTile(i, j).getType() == 3){</span>
+<span class="fc" id="L418">						mapArray[j][i] = 3;</span>
+<span class="fc" id="L419">					}</span>
+					else{
+<span class="fc" id="L421">						mapArray[j][i] = 1;</span>
+					}
+<span class="fc" id="L423">				}</span>
+				else {
+<span class="fc" id="L425">					mapArray[j][i] = 0;</span>
+				}
+			}
+		}
+<span class="fc" id="L429">		return mapArray;</span>
+	}
+	
+	/**
+	 *  Turn the binary map into an Object Map
+	 *  
+	 * @param mapArray	2D integer array version of Map
+	 * @return	map
+	 */
+	public Map convertFromBinaryMap(int[][] mapArray){
+<span class="fc" id="L439">		this.setMapSize(mapArray[0].length, mapArray.length);</span>
+<span class="fc" id="L440">		this.initializeMap();</span>
+		
+<span class="fc bfc" id="L442" title="All 2 branches covered.">		for (int i = 0; i &lt; mapArray.length; i++){</span>
+<span class="fc bfc" id="L443" title="All 2 branches covered.">			for (int j = 0; j &lt; mapArray[i].length; j++){</span>
+<span class="fc bfc" id="L444" title="All 2 branches covered.">				if (mapArray[i][j] == 1){</span>
+<span class="fc" id="L445">					this.getTile(j, i).setType(1);</span>
+<span class="fc" id="L446">				}</span>
+<span class="fc bfc" id="L447" title="All 2 branches covered.">				else if (mapArray[i][j] == 2){</span>
+<span class="fc" id="L448">					this.getTile(j, i).setType(2);</span>
+<span class="fc" id="L449">				}</span>
+<span class="fc bfc" id="L450" title="All 2 branches covered.">				else if (mapArray[i][j] == 3){</span>
+<span class="fc" id="L451">					this.getTile(j, i).setType(3);</span>
+<span class="fc" id="L452">				}</span>
+				else{
+<span class="fc" id="L454">					this.getTile(j, i).setType(0);</span>
+				}
+			}
+		}
+<span class="fc" id="L458">		return this;</span>
+	}
+	
+	/**
+	 * Verify whether the design map is valid according to the game rules
+	 * 
+	 * @return validity
+	 */
+	public boolean ValidityOfMap(){
+		boolean validity;
+<span class="pc bpc" id="L468" title="3 of 4 branches missed.">		if (validityOfMap || validityOfPath){</span>
+<span class="fc" id="L469">			validity = true;</span>
+<span class="fc" id="L470">		}</span>
+		else {
+<span class="nc" id="L472">			validity = false;</span>
+		}
+<span class="fc" id="L474">		return validity;</span>
+	}
+	
+	/**
+	 * Print the Map
+	 */
+	public String toString(){
+
+<span class="fc" id="L482">		String s = &quot;\n&quot;;</span>
+<span class="fc bfc" id="L483" title="All 2 branches covered.">		for (int j = 0; j &lt; getHeightOfMap(); j++){</span>
+<span class="fc bfc" id="L484" title="All 2 branches covered.">			for (int i = 0; i &lt; getWidthOfMap(); i++){</span>
+<span class="fc" id="L485">				s+=(getTile(i,j) + &quot; &quot;);</span>
+			}
+<span class="fc" id="L487">			s +=&quot;\n&quot;;</span>
+		}
+<span class="fc" id="L489">		return s;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 28, 2025 8:22:47 PM)</div></body></html>

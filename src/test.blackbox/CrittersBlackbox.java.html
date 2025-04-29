@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>CrittersBlackbox.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 28, 2025 8:22:47 PM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">test.blackbox</a> &gt; <span class="el_source">CrittersBlackbox.java</span></div><h1>CrittersBlackbox.java</h1><pre class="source lang-java linenums">package test.blackbox;
+
+import critters.Critter;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+<span class="fc" id="L9">public class CrittersBlackbox {</span>
+
+    private Critter critter;
+    private int[][] path;
+
+    // Minimal concrete Critter subclass for testing
+    private class TestCritter extends Critter {
+<span class="fc" id="L16">        public TestCritter(int[][] pLocations, double pHealth, double pArmor, double pSpeed, int pReward, String pName, type pCritterType) {</span>
+<span class="fc" id="L17">            super(pLocations, pHealth, pArmor, pSpeed, pReward, pName, pCritterType);</span>
+<span class="fc" id="L18">        }</span>
+    }
+
+    @BeforeEach
+    public void setup() {
+<span class="fc" id="L23">        path = new int[][]{{0, 0}, {100, 0}};</span>
+<span class="fc" id="L24">        critter = new TestCritter(path, 100, 1.0, 1.0, 10, &quot;TestCritter&quot;, Critter.type.SCOUT);</span>
+<span class="fc" id="L25">    }</span>
+
+    @Test
+    public void testInitialState() {
+<span class="fc" id="L29">        assertEquals(100, critter.getHealth());</span>
+<span class="fc" id="L30">        assertEquals(&quot;TestCritter&quot;, critter.getName());</span>
+<span class="fc" id="L31">        assertEquals(10, critter.getReward());</span>
+<span class="fc" id="L32">        assertTrue(critter.isAlive());</span>
+<span class="fc" id="L33">        assertEquals(0, critter.getXLoc());</span>
+<span class="fc" id="L34">        assertEquals(0, critter.getYLoc());</span>
+<span class="fc" id="L35">        assertFalse(critter.isVisible());</span>
+<span class="fc" id="L36">        assertFalse(critter.isAtEndPoint());</span>
+<span class="fc" id="L37">    }</span>
+
+    @Test
+    public void testTakeDamageKillsCritter() {
+<span class="fc" id="L41">        critter.takeDamage(100); // With armor 1.0</span>
+<span class="fc" id="L42">        assertFalse(critter.isAlive());</span>
+<span class="fc" id="L43">        assertFalse(critter.isVisible());</span>
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">        assertTrue(critter.getHealth() &lt;= 0);</span>
+<span class="fc" id="L45">    }</span>
+    
+    @Test
+    public void testTakeNegativeDamage() {
+<span class="pc" id="L49">    	assertThrows(IllegalArgumentException.class, () -&gt; critter.takeDamage(-10),</span>
+<span class="fc" id="L50">    	        &quot;Taking negative damage should throw IllegalArgumentException&quot;);</span>
+<span class="nc" id="L51">    }</span>
+
+    @Test
+    public void testTakeDamageWithArmor() {
+<span class="fc" id="L55">        critter.takeDamage(50); // Should reduce health by 50 (armor = 1.0)</span>
+<span class="fc" id="L56">        assertEquals(50.0, critter.getHealth(), 0.001);</span>
+<span class="fc" id="L57">    }</span>
+
+    @Test
+    public void testFreezeAndUnfreeze() throws InterruptedException {
+<span class="fc" id="L61">        double normalSpeed = critter.getSpeed();</span>
+<span class="fc" id="L62">        critter.freezeCritter();</span>
+<span class="fc" id="L63">        double frozenSpeed = critter.getSpeed();</span>
+
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">        assertTrue(frozenSpeed &lt; normalSpeed);</span>
+<span class="fc" id="L66">        assertNotEquals(normalSpeed, frozenSpeed);</span>
+
+<span class="fc" id="L68">        critter.setFreezeDuration(10);</span>
+<span class="fc" id="L69">        Thread.sleep(20);</span>
+<span class="fc" id="L70">        critter.move(); // will trigger unfreeze</span>
+<span class="fc" id="L71">        assertEquals(normalSpeed, critter.getSpeed(), 0.001);</span>
+<span class="fc" id="L72">    }</span>
+
+    @Test
+    public void testMoveIncreasesDistance() {
+<span class="fc" id="L76">        double oldX = critter.getXLoc();</span>
+<span class="fc" id="L77">        double oldDistance = critter.getDistanceTravelled();</span>
+<span class="fc" id="L78">        critter.move();</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">        assertTrue(critter.getXLoc() &gt; oldX);</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        assertTrue(critter.getDistanceTravelled() &gt; oldDistance);</span>
+<span class="fc" id="L81">        assertTrue(critter.isVisible());</span>
+<span class="fc" id="L82">    }</span>
+
+    @Test
+    public void testCritterDirectionUpdates() {
+<span class="fc" id="L86">        critter.move();</span>
+<span class="fc" id="L87">        assertEquals(Critter.direction.RIGHT, critter.getCritterDirection());</span>
+<span class="fc" id="L88">    }</span>
+
+    @Test
+    public void testEndPointDetection() {
+        // Move until the end
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        for (int i = 0; i &lt; 200; i++) critter.move();</span>
+<span class="fc" id="L94">        assertTrue(critter.isAtEndPoint());</span>
+<span class="fc" id="L95">        assertFalse(critter.isVisible());</span>
+<span class="fc" id="L96">    }</span>
+
+    @Test
+    public void testCanMoveReturnsTrue() {
+<span class="fc" id="L100">        assertTrue(critter.CanMove());</span>
+<span class="fc" id="L101">    }</span>
+
+    @Test
+    public void testCritterTypeIsCorrect() {
+<span class="fc" id="L105">        assertEquals(Critter.type.SCOUT, critter.getType());</span>
+<span class="fc" id="L106">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 28, 2025 8:22:47 PM)</div></body></html>

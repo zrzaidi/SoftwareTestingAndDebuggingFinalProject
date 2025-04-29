@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>Critter.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 28, 2025 8:22:47 PM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">critters</a> &gt; <span class="el_source">Critter.java</span></div><h1>Critter.java</h1><pre class="source lang-java linenums">package critters;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+abstract public class Critter{
+
+<span class="fc" id="L9">	public enum type{GRUNT, SCOUT, ARMORED, TANK, BOSS};</span>
+<span class="fc" id="L10">	public enum direction {LEFT, RIGHT, UP, DOWN};</span>
+	
+	private double 			health;
+	private double 			speed;
+	private int				reward;
+	private double 			armor;
+	private float 			XLoc;
+	private float			YLoc;
+	private String			name;
+	private boolean 		alive;
+<span class="fc" id="L20">	private final double	freezeMultiplier = 0.3;	//how much speed is reduced by when frozen</span>
+<span class="fc" id="L21">	private boolean			frozen = false;</span>
+<span class="fc" id="L22">	private long			freezeStartTime = -10000;	//when the critter was frozen</span>
+<span class="fc" id="L23">	private long 			freezeDuration = 4000;		//How long freeze lasts in ms</span>
+<span class="fc" id="L24">	public boolean			canMove = true;</span>
+	private int[][] 		locations;
+<span class="fc" id="L26">	private int 			locationIncrementer = 0;</span>
+<span class="fc" id="L27">	private boolean 		visible = false;</span>
+<span class="fc" id="L28">	private boolean 		atEndPoint = false;</span>
+	protected type			critterType;
+
+	private double distanceTravelled;
+
+
+
+	direction critterDirection;
+
+	//initialize critter at the start 
+<span class="fc" id="L38">	public Critter(int[][] pLocations, double pHealth, double pArmor, double pSpeed, int pReward, String pName, type pCritterType){</span>
+<span class="fc" id="L39">		health =pHealth;</span>
+<span class="fc" id="L40">		armor = pArmor;</span>
+<span class="fc" id="L41">		speed =pSpeed;</span>
+<span class="fc" id="L42">		reward = pReward;</span>
+<span class="fc" id="L43">		name = pName;</span>
+<span class="fc" id="L44">		XLoc = pLocations[0][0];</span>
+<span class="fc" id="L45">		YLoc = pLocations[0][1];</span>
+<span class="fc" id="L46">		alive = true;</span>
+<span class="fc" id="L47">		locations = pLocations;</span>
+
+<span class="fc" id="L49">		critterType = pCritterType;</span>
+<span class="fc" id="L50">		distanceTravelled=0;</span>
+
+<span class="fc" id="L52">	}</span>
+
+
+	
+	public void move(){
+<span class="pc bpc" id="L57" title="1 of 4 branches missed.">		if(System.currentTimeMillis() &gt; freezeStartTime + freezeDuration&amp;&amp;frozen){</span>
+<span class="fc" id="L58">			unfreezeCritter();</span>
+		}
+
+<span class="fc bfc" id="L61" title="All 2 branches covered.">		if(locationIncrementer ==0)</span>
+		{
+<span class="fc" id="L63">			visible = true;</span>
+		}
+
+		try{
+
+<span class="pc bpc" id="L68" title="1 of 4 branches missed.">			if(!(XLoc&gt;locations[locationIncrementer+1][0]-this.getSpeed()&amp;&amp;XLoc&lt;locations[locationIncrementer+1][0]+this.getSpeed()) ){</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">				if(XLoc&lt;=locations[locationIncrementer+1][0]){</span>
+<span class="fc" id="L70">					XLoc += this.getSpeed();</span>
+<span class="fc" id="L71">					distanceTravelled+=this.getSpeed();</span>
+<span class="fc" id="L72">					critterDirection = direction.RIGHT;</span>
+<span class="fc" id="L73">				}</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">				else if(XLoc&gt;=locations[locationIncrementer+1][0])</span>
+				{
+<span class="nc" id="L76">					XLoc -= this.getSpeed();</span>
+<span class="nc" id="L77">					distanceTravelled+=this.getSpeed();</span>
+<span class="nc" id="L78">					critterDirection = direction.LEFT;</span>
+				}
+<span class="nc" id="L80">			}</span>
+<span class="pc bpc" id="L81" title="1 of 4 branches missed.">			else if(!(YLoc&gt;=locations[locationIncrementer+1][1]-this.getSpeed()&amp;&amp;YLoc&lt;=locations[locationIncrementer+1][1]+this.getSpeed()) ){</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">				if(YLoc&lt;=locations[locationIncrementer+1][1]){</span>
+<span class="fc" id="L83">					YLoc += this.getSpeed();</span>
+<span class="fc" id="L84">					distanceTravelled+=this.getSpeed();</span>
+<span class="fc" id="L85">					critterDirection = direction.DOWN;</span>
+<span class="fc" id="L86">				}</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">				else if(YLoc&gt;=locations[locationIncrementer+1][1]){</span>
+<span class="nc" id="L88">					YLoc -= this.getSpeed();</span>
+<span class="nc" id="L89">					distanceTravelled+=this.getSpeed();</span>
+<span class="nc" id="L90">					critterDirection = direction.UP;</span>
+				}
+<span class="nc" id="L92">			}</span>
+			else{
+<span class="fc" id="L94">				locationIncrementer++;</span>
+			}
+
+
+<span class="fc" id="L98">		}</span>
+<span class="fc" id="L99">		catch(IndexOutOfBoundsException e){</span>
+<span class="fc" id="L100">			visible=false;</span>
+<span class="fc" id="L101">			atEndPoint = true;</span>
+		}
+<span class="fc" id="L103">	}</span>
+
+
+	public void takeDamage(double damage){
+
+
+<span class="fc" id="L109">		health = health - damage/armor;</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">		if(health &lt;= 0){</span>
+<span class="fc" id="L111">			alive = false;</span>
+<span class="fc" id="L112">			visible = false;</span>
+		}
+		
+
+<span class="fc" id="L116">	}</span>
+	public void freezeCritter(){
+<span class="fc" id="L118">		this.frozen = true;</span>
+<span class="fc" id="L119">		freezeStartTime = System.currentTimeMillis();</span>
+<span class="fc" id="L120">	}</span>
+	public void unfreezeCritter(){
+<span class="fc" id="L122">		this.frozen = false;</span>
+<span class="fc" id="L123">		freezeStartTime = -10000;</span>
+<span class="fc" id="L124">	}</span>
+	
+
+
+	//Getters and Setters
+	
+	public String getName() {
+<span class="fc" id="L131">		return name;</span>
+	}
+	
+
+	
+
+	public double getDistanceTravelled() {
+<span class="fc" id="L138">		return distanceTravelled;</span>
+	}
+
+
+
+	public boolean isAtEndPoint() {
+<span class="fc" id="L144">		return atEndPoint;</span>
+	}
+
+
+
+	public void setFreezeDuration (long duration){
+<span class="fc" id="L150">		freezeDuration = duration;</span>
+<span class="fc" id="L151">	}</span>
+	
+	
+	public double getSpeed() {
+<span class="fc bfc" id="L155" title="All 2 branches covered.">		if(frozen)</span>
+<span class="fc" id="L156">			return (speed * freezeMultiplier);</span>
+		else
+<span class="fc" id="L158">			return speed;</span>
+	}
+
+	public direction getCritterDirection() {
+<span class="fc" id="L162">		return critterDirection;</span>
+	}
+
+	public boolean isVisible() {
+<span class="fc" id="L166">		return visible;</span>
+	}
+
+
+	public double getHealth() {
+<span class="fc" id="L171">		return health;</span>
+	}
+
+
+	public float getXLoc() {
+<span class="fc" id="L176">		return XLoc;</span>
+	}
+
+
+	public float getYLoc() {
+<span class="fc" id="L181">		return YLoc;</span>
+	}
+
+
+	public int getReward() {
+<span class="fc" id="L186">		return reward;</span>
+	}
+
+
+	public boolean isAlive() {
+<span class="fc" id="L191">		return alive;</span>
+	}
+
+
+	public boolean CanMove() {
+<span class="fc" id="L196">		return canMove;</span>
+	}
+	
+
+	public type getType(){
+<span class="fc" id="L201">		return critterType;</span>
+	}
+	
+	
+
+
+
+}
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 28, 2025 8:22:47 PM)</div></body></html>

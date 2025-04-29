@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>EditMapScreen.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 28, 2025 8:22:47 PM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">game</a> &gt; <span class="el_source">EditMapScreen.java</span></div><h1>EditMapScreen.java</h1><pre class="source lang-java linenums">package game;
+
+
+import grid.MapTile;
+import grid.PathTile;
+import grid.Tile;
+
+import java.awt.Font;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import map.Map;
+import map.MapEditor;
+
+import org.lwjgl.input.Mouse;
+import org.newdawn.slick.AppGameContainer;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.TrueTypeFont;
+import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.gui.TextField;
+import org.newdawn.slick.state.BasicGameState;
+import org.newdawn.slick.state.StateBasedGame;
+
+public class EditMapScreen extends BasicGameState {
+	//test test
+	Image SandTile;
+	Image ExitButtonGraphic;
+	Image CreateMapButtonGraphic;
+	Image BlackTileBoundaryGraphic;
+	Image StartingPointGraphic;
+	Image ExitPointGraphic;
+	Image BluePathTileGraphic;
+	Image SandTileGraphic;
+	Image GravelTileGraphic;
+	Image SaveMapButtonGraphic;
+
+	
+<span class="fc" id="L42">	private final int mouseClickDelay = 200;</span>
+<span class="fc" id="L43">	private long lastClick=(-1*mouseClickDelay);</span>
+
+//	ArrayList&lt;int[]&gt; mapPoints = new ArrayList&lt;int[]&gt;(); 
+<span class="fc" id="L46">	ArrayList&lt;Integer&gt; mapPoints = new ArrayList&lt;Integer&gt;();</span>
+	Rectangle ExitGameButton;
+	Rectangle CreateMapButton;
+	Rectangle SaveMapButton;
+<span class="fc" id="L50">	ArrayList&lt;Rectangle&gt; buttonList = new ArrayList&lt;Rectangle&gt;();</span>
+	
+	
+	TextField mapWidthTextField;
+	TextField mapHeightTextField;
+	TextField mapNameTextField;
+
+	Map userCreatedMap;
+	MapEditor saveMap;
+	
+	Font font ;
+	TrueTypeFont ttf;
+
+<span class="fc" id="L63">	public final String widthString = &quot;Enter Map Width:&quot;;</span>
+<span class="fc" id="L64">	public final String heightString = &quot;Enter Map Height:&quot;;</span>
+<span class="fc" id="L65">	public final String nameString = &quot;Enter Map Name: &quot;;</span>
+<span class="fc" id="L66">	public static String statusString= &quot;&quot;;</span>
+
+<span class="fc" id="L68">	private final int minimumMapDimension = 12;</span>
+<span class="fc" id="L69">	private final int maximumMapDimension = 20;</span>
+
+<span class="fc" id="L71">	public final int mapDrawOffsetX = 96;</span>
+<span class="fc" id="L72">	public final int mapDrawOffsetY = 128;</span>
+
+<span class="fc" id="L74">	private final int mapNameMaximumLength = 15;</span>
+
+<span class="fc" id="L76">	private static int mapWidthInput=0;</span>
+<span class="fc" id="L77">	private static int mapHeightInput=0;</span>
+<span class="fc" id="L78">	private static String mapNameInput =&quot;&quot;;</span>
+	
+<span class="fc" id="L80">	private int selectedTileX=-1;</span>
+<span class="fc" id="L81">	private int selectedTileY=-1;</span>
+	private int[] exitPoint;
+	
+
+<span class="fc" id="L85">	boolean mapInputAccepted = false;</span>
+<span class="fc" id="L86">	boolean startingPointAccepted=false;</span>
+<span class="fc" id="L87">	boolean exitPointAccepted = false;</span>
+<span class="fc" id="L88">	boolean mapCreated = false;</span>
+
+<span class="fc" id="L90">	public EditMapScreen (int state){</span>
+
+<span class="fc" id="L92">	}</span>
+
+	@Override
+	public void init(GameContainer container, StateBasedGame arg1) throws SlickException {
+		
+<span class="nc" id="L97">		loadImages();</span>
+
+
+<span class="nc" id="L100">		font = new Font(&quot;Verdana&quot;, Font.PLAIN, 12);</span>
+<span class="nc" id="L101">		ttf = new TrueTypeFont(font, true);</span>
+
+<span class="nc" id="L103">		mapWidthTextField = new TextField(container, ttf , 40,60,60,20);</span>
+<span class="nc" id="L104">		mapHeightTextField = new TextField(container, ttf, 40 +ttf.getWidth(widthString)+10, 60, 60, 20);</span>
+<span class="nc" id="L105">		mapNameTextField = new TextField (container, ttf, 40 +ttf.getWidth(widthString)+10 , 10,100,20);</span>
+
+
+<span class="nc" id="L108">	}</span>
+
+	@Override
+	public void update(GameContainer container, StateBasedGame sbg, int delta) throws SlickException {
+
+<span class="nc bnc" id="L113" title="All 2 branches missed.">		if(mapInputAccepted){</span>
+<span class="nc" id="L114">			mapWidthTextField.setAcceptingInput(false);</span>
+<span class="nc" id="L115">			mapHeightTextField.setAcceptingInput(false);</span>
+<span class="nc" id="L116">			mapNameTextField.setAcceptingInput(false);</span>
+		}
+
+
+
+<span class="nc bnc" id="L121" title="All 2 branches missed.">		if(Mouse.isButtonDown(0)){</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">			if(mouseOnMap(Mouse.getX(),container.getHeight()-Mouse.getY())){</span>
+<span class="nc" id="L123">				mapGridClicked(Mouse.getX(), container.getHeight() - Mouse.getY(), sbg, container);</span>
+<span class="nc" id="L124">			}</span>
+			else{
+				try {
+<span class="nc" id="L127">					mouseClicked(Mouse.getX(), container.getHeight() - Mouse.getY(), sbg, container);</span>
+<span class="nc" id="L128">				} catch (IOException e) {</span>
+					// TODO Auto-generated catch block
+<span class="nc" id="L130">					e.printStackTrace();</span>
+				}
+			}
+		}
+<span class="nc" id="L134">	}</span>
+
+	@Override
+	public void render(GameContainer container, StateBasedGame sbg, Graphics g) throws SlickException {
+<span class="nc" id="L138">		drawBackGroundAndButtons(container);</span>
+	
+
+<span class="nc" id="L141">		ttf.drawString(mapWidthTextField.getX(), mapWidthTextField.getY()+mapWidthTextField.getHeight()+10, statusString, Color.black);</span>
+
+<span class="nc" id="L143">		g.setColor(Color.white);</span>
+
+<span class="nc bnc" id="L145" title="All 2 branches missed.">		if(mapInputAccepted){</span>
+<span class="nc" id="L146">			drawMap(container);</span>
+<span class="nc" id="L147">			ttf.drawString(30, 0, &quot;&quot;+userCreatedMap.ValidityOfMap());</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">			if(mouseOnMap(Mouse.getX(),container.getHeight()-Mouse.getY())){</span>
+<span class="nc bnc" id="L149" title="All 2 branches missed.">				if(!startingPointAccepted)	</span>
+<span class="nc" id="L150">					StartingPointGraphic.drawCentered(getClosestTileCenter(Mouse.getX()), container.getHeight() - getClosestTileCenter(Mouse.getY()));</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">				else if(!exitPointAccepted )</span>
+<span class="nc" id="L152">					ExitPointGraphic.drawCentered(getClosestTileCenter(Mouse.getX()), container.getHeight() - getClosestTileCenter(Mouse.getY()));		</span>
+			}
+
+<span class="nc bnc" id="L155" title="All 2 branches missed.">			if(startingPointAccepted){</span>
+//				int[] startingpoint =mapPoints.get(0);
+<span class="nc" id="L157">				int[] startingpoint = new int[] {mapPoints.get(0), mapPoints.get(1)};</span>
+<span class="nc" id="L158">				StartingPointGraphic.drawCentered(startingpoint[0]*32 +mapDrawOffsetX +16, startingpoint[1]*32 +mapDrawOffsetY +16);</span>
+			}
+<span class="nc bnc" id="L160" title="All 2 branches missed.">			if(exitPointAccepted){</span>
+				
+<span class="nc" id="L162">				ExitPointGraphic.drawCentered(exitPoint[0]*32 +mapDrawOffsetX +16, exitPoint[1]*32 +mapDrawOffsetY +16);</span>
+			}
+<span class="nc bnc" id="L164" title="All 2 branches missed.">			if(!mapCreated){</span>
+			//create the mapgrid
+<span class="nc" id="L166">			generateMapGrid();</span>
+			}
+<span class="nc bnc" id="L168" title="All 2 branches missed.">			if (!mapCreated)</span>
+<span class="nc" id="L169">				SaveMapButtonGraphic.drawCentered(container.getWidth()/2 , container.getHeight() - SaveMapButtonGraphic.getHeight()/2 -10 );</span>
+<span class="nc" id="L170">		}</span>
+		else{
+<span class="nc" id="L172">			ttf.drawString(40, 40, widthString, Color.black);</span>
+<span class="nc" id="L173">			ttf.drawString(40 +ttf.getWidth(widthString)+10, 40, heightString, Color.black);</span>
+<span class="nc" id="L174">			ttf.drawString(40, 10, nameString, Color.black);</span>
+<span class="nc" id="L175">			CreateMapButtonGraphic.draw(mapHeightTextField.getX() + ttf.getWidth(widthString)+10, 40 + mapWidthTextField.getHeight()/2 );</span>
+
+		}
+
+
+<span class="nc" id="L180">		mapWidthTextField.render(container, g);</span>
+<span class="nc" id="L181">		mapHeightTextField.render(container, g);</span>
+<span class="nc" id="L182">		mapNameTextField.render(container, g);</span>
+<span class="nc" id="L183">	}</span>
+
+
+
+
+
+	public void drawBackGroundAndButtons(GameContainer container){
+<span class="nc bnc" id="L190" title="All 2 branches missed.">		for(int x = 0; x &lt;container.getWidth(); x+=SandTile.getWidth()){</span>
+<span class="nc bnc" id="L191" title="All 2 branches missed.">			for(int y = 0 ; y&lt; container.getHeight(); y+=SandTile.getHeight()){</span>
+<span class="nc" id="L192">				SandTile.draw(x,y);</span>
+			}
+		}
+
+<span class="nc" id="L196">		ExitButtonGraphic.draw(container.getWidth()-ExitButtonGraphic.getWidth(), container.getHeight()-ExitButtonGraphic.getHeight()-2);</span>
+<span class="nc" id="L197">	}</span>
+	
+		
+	public void drawMap(GameContainer container){
+<span class="nc bnc" id="L201" title="All 2 branches missed.">		for(int i = 0 ; i &lt; userCreatedMap.getWidthOfMap(); i++){</span>
+<span class="nc bnc" id="L202" title="All 2 branches missed.">			for(int j = 0 ; j &lt; userCreatedMap.getHeightOfMap() ; j++){</span>
+				
+<span class="nc bnc" id="L204" title="All 2 branches missed.">					if (userCreatedMap.getTile(i, j) instanceof PathTile){	</span>
+<span class="nc" id="L205">						GravelTileGraphic.draw(mapDrawOffsetX +i * userCreatedMap.getPixelSize(), mapDrawOffsetY + j * userCreatedMap.getPixelSize());</span>
+<span class="nc" id="L206">						continue;</span>
+					}
+<span class="nc bnc" id="L208" title="All 2 branches missed.">					if (userCreatedMap.getTile(i, j) instanceof MapTile){		</span>
+<span class="nc" id="L209">						SandTileGraphic.draw(mapDrawOffsetX +i * userCreatedMap.getPixelSize(), mapDrawOffsetY + j * userCreatedMap.getPixelSize());</span>
+						continue;
+					}
+
+				}
+			}
+	
+<span class="nc" id="L216">		}</span>
+	
+
+	public void loadImages() throws SlickException{
+<span class="nc" id="L220">		SandTile = new Image(&quot;graphics/SandTile.png&quot;);</span>
+<span class="nc" id="L221">		ExitButtonGraphic = new Image (&quot;graphics/ExitButton.png&quot;);</span>
+<span class="nc" id="L222">		CreateMapButtonGraphic = new Image(&quot;graphics/CreateMapButtonGraphic.png&quot;);</span>
+<span class="nc" id="L223">		BlackTileBoundaryGraphic = new Image(&quot;graphics/BlackTileBoundaryGraphic.png&quot;);</span>
+<span class="nc" id="L224">		StartingPointGraphic = new Image(&quot;graphics/StartingPointGraphic.png&quot;);</span>
+<span class="nc" id="L225">		ExitPointGraphic = new Image(&quot;graphics/ExitPointGraphic.png&quot;);</span>
+<span class="nc" id="L226">		BluePathTileGraphic = new Image(&quot;graphics/BluePathTileGraphic.png&quot;);</span>
+<span class="nc" id="L227">		SandTileGraphic = new Image(&quot;graphics/SandTile.png&quot;);</span>
+<span class="nc" id="L228">		GravelTileGraphic = new Image(&quot;graphics/GravelTile.png&quot;);</span>
+<span class="nc" id="L229">		SaveMapButtonGraphic = new Image(&quot;graphics/SaveMapButtonGraphic.png&quot;);</span>
+		
+<span class="nc" id="L231">	}</span>
+
+	public float getClosestTileCenter(float X){
+
+<span class="fc" id="L235">		return (float) (Math.floor(X / 32) * 32 + 32 / 2);</span>
+	}
+
+	public boolean mouseOnMap(int x, int y){
+<span class="pc bpc" id="L239" title="7 of 8 branches missed.">		if(x&gt;mapDrawOffsetX &amp;&amp; x &lt; mapDrawOffsetX +32*mapWidthInput &amp;&amp; y&gt; mapDrawOffsetY &amp;&amp; y &lt; mapDrawOffsetY +32*mapHeightInput){</span>
+<span class="nc" id="L240">			return true;</span>
+		}
+		else
+<span class="fc" id="L243">			return false;</span>
+	}
+
+
+	public void mapGridClicked(int x, int y, StateBasedGame sbg, GameContainer container){
+
+<span class="pc bpc" id="L249" title="1 of 2 branches missed.">		if(lastClick + mouseClickDelay &gt; System.currentTimeMillis())</span>
+<span class="nc" id="L250">			return;</span>
+<span class="fc" id="L251">		lastClick = System.currentTimeMillis();</span>
+
+<span class="pc bpc" id="L253" title="1 of 2 branches missed.">		if(mapCreated)</span>
+<span class="nc" id="L254">			return;</span>
+
+		
+<span class="fc" id="L257">		int xLoc = (int) Math.floor((x-mapDrawOffsetX) / 32);</span>
+<span class="fc" id="L258">		int yLoc = (int) Math.floor((y-mapDrawOffsetY) / 32);</span>
+
+<span class="pc bpc" id="L260" title="1 of 2 branches missed.">		if(!startingPointAccepted){</span>
+<span class="pc bpc" id="L261" title="4 of 8 branches missed.">			if(xLoc == 0 || xLoc == mapWidthInput-1 ||yLoc == 0 || yLoc == mapHeightInput-1){</span>
+
+<span class="nc" id="L263">				userCreatedMap.placeEntry(xLoc, yLoc);</span>
+
+<span class="nc" id="L265">				mapPoints.add(xLoc);</span>
+<span class="nc" id="L266">				mapPoints.add(yLoc);</span>
+<span class="nc" id="L267">				selectedTileX = xLoc;</span>
+<span class="nc" id="L268">				selectedTileY = yLoc;</span>
+<span class="nc" id="L269">				startingPointAccepted = true;</span>
+<span class="nc" id="L270">				statusString = &quot;Select Exit Point&quot;;</span>
+<span class="nc" id="L271">				return;</span>
+			}
+			else
+<span class="fc" id="L274">				statusString = &quot;Invalid Starting Point. Starting points can only be placed on the edges of the map&quot;;</span>
+<span class="fc" id="L275">			return;</span>
+
+		}
+<span class="nc bnc" id="L278" title="All 2 branches missed.">		if(!exitPointAccepted){</span>
+
+<span class="nc" id="L280">			int[] startingPoint = new int[] {mapPoints.get(0), mapPoints.get(1)};</span>
+<span class="nc bnc" id="L281" title="All 4 branches missed.">			if(xLoc == startingPoint[0] &amp;&amp;yLoc ==startingPoint[1]){</span>
+<span class="nc" id="L282">				statusString = &quot;Cannot place Exit point on starting point&quot;;</span>
+<span class="nc" id="L283">				return;</span>
+			}
+<span class="nc bnc" id="L285" title="All 8 branches missed.">			if(xLoc == 0 || xLoc == mapWidthInput-1 ||yLoc == 0 || yLoc == mapHeightInput-1 ){</span>
+<span class="nc" id="L286">				userCreatedMap.placeExit(xLoc, yLoc);</span>
+				
+<span class="nc" id="L288">				exitPoint = new int[] {xLoc, yLoc};</span>
+<span class="nc" id="L289">				exitPointAccepted = true;</span>
+<span class="nc" id="L290">				statusString = &quot;Select any point on a blue line&quot;;</span>
+<span class="nc" id="L291">				return;</span>
+			}
+			else
+<span class="nc" id="L294">				statusString = &quot;Invalid Exit Point. Exit points can only be placed on the edges of the map&quot;;</span>
+<span class="nc" id="L295">			return;</span>
+		}
+		
+<span class="nc bnc" id="L298" title="All 4 branches missed.">		if(exitPointAccepted&amp;&amp;startingPointAccepted){</span>
+<span class="nc bnc" id="L299" title="All 4 branches missed.">			if(xLoc==selectedTileX ||yLoc == selectedTileY){</span>
+
+<span class="nc" id="L301">				userCreatedMap.linkTwoPoints(new PathTile(selectedTileX, selectedTileY), new PathTile(xLoc, yLoc));</span>
+
+<span class="nc" id="L303">				mapPoints.add(xLoc);</span>
+<span class="nc" id="L304">				mapPoints.add(yLoc);</span>
+<span class="nc" id="L305">				selectedTileX = xLoc;</span>
+<span class="nc" id="L306">				selectedTileY = yLoc;</span>
+			}
+		}
+
+		
+<span class="nc" id="L311">	}</span>
+
+
+
+	public void mouseClicked(int x, int y, StateBasedGame sbg, GameContainer container) throws SlickException, IOException{
+
+		//protection against multiple click registration
+<span class="nc bnc" id="L318" title="All 2 branches missed.">				if(lastClick + mouseClickDelay &gt; System.currentTimeMillis())</span>
+<span class="nc" id="L319">					return;</span>
+<span class="nc" id="L320">				lastClick = System.currentTimeMillis();</span>
+		
+		
+<span class="nc bnc" id="L323" title="All 2 branches missed.">		if(ExitGameButton.contains(x, y)){</span>
+<span class="nc" id="L324">			Mouse.getDY();</span>
+<span class="nc" id="L325">			AppGameContainer gameContainer = (AppGameContainer) container;</span>
+<span class="nc" id="L326">			gameContainer.setDisplayMode(640, 480, false);</span>
+<span class="nc" id="L327">			reInitialize();</span>
+<span class="nc" id="L328">			sbg.enterState(Game.menuScreen);</span>
+		}
+
+<span class="nc bnc" id="L331" title="All 2 branches missed.">		if(CreateMapButton.contains(x, y)){</span>
+<span class="nc" id="L332">			statusString =&quot;&quot;;</span>
+			try{
+<span class="nc" id="L334">				mapWidthInput = Integer.parseInt(mapWidthTextField.getText());</span>
+<span class="nc" id="L335">				mapHeightInput = Integer.parseInt(mapHeightTextField.getText());</span>
+<span class="nc" id="L336">				mapNameInput = mapNameTextField.getText();</span>
+<span class="nc" id="L337">			}</span>
+<span class="nc" id="L338">			catch(NumberFormatException e){</span>
+<span class="nc" id="L339">				statusString = &quot;Illegal input format&quot;;</span>
+			}
+<span class="nc bnc" id="L341" title="All 4 branches missed.">			if(mapWidthInput &lt;minimumMapDimension || mapHeightInput &lt;minimumMapDimension)</span>
+			{
+<span class="nc" id="L343">				statusString = &quot;Map to small. Minimum dimensions are &quot;+minimumMapDimension+&quot;x&quot;+minimumMapDimension;</span>
+<span class="nc" id="L344">				mapInputAccepted = false;</span>
+<span class="nc" id="L345">			}</span>
+<span class="nc bnc" id="L346" title="All 4 branches missed.">			else if (mapWidthInput &gt; maximumMapDimension || mapHeightInput &gt; maximumMapDimension){</span>
+<span class="nc" id="L347">				statusString = &quot;Map to large. Maximum dimensions are &quot;+maximumMapDimension+&quot;x&quot;+maximumMapDimension;</span>
+<span class="nc" id="L348">				mapInputAccepted = false;</span>
+<span class="nc" id="L349">			}</span>
+<span class="nc bnc" id="L350" title="All 2 branches missed.">			else if(mapNameInput.equals(&quot;&quot;)){</span>
+<span class="nc" id="L351">				statusString = &quot;Map name cannot be null&quot;;</span>
+<span class="nc" id="L352">				mapInputAccepted = false;</span>
+<span class="nc" id="L353">			}</span>
+<span class="nc bnc" id="L354" title="All 2 branches missed.">			else if (mapNameInput.length()&gt;mapNameMaximumLength){</span>
+<span class="nc" id="L355">				statusString = &quot;Map name is too long&quot;;</span>
+<span class="nc" id="L356">				mapInputAccepted = false;</span>
+<span class="nc" id="L357">			}</span>
+			else{
+<span class="nc" id="L359">				userCreatedMap = new Map();</span>
+<span class="nc" id="L360">				userCreatedMap.setMapSize(mapWidthInput, mapHeightInput);</span>
+<span class="nc" id="L361">				userCreatedMap.initializeMap();</span>
+<span class="nc" id="L362">				mapInputAccepted = true;</span>
+<span class="nc" id="L363">				statusString = &quot;Select a starting location&quot;;</span>
+			}
+
+		}
+
+<span class="nc bnc" id="L368" title="All 4 branches missed.">		if(SaveMapButton.contains(x,y) &amp;&amp; !mapCreated ){</span>
+<span class="nc bnc" id="L369" title="All 10 branches missed.">			if(mapInputAccepted &amp;&amp; exitPointAccepted &amp;&amp; startingPointAccepted &amp;&amp; mapPoints.get(mapPoints.size()-2)== exitPoint[0] &amp;&amp; mapPoints.get(mapPoints.size()-1)==exitPoint[1]){</span>
+<span class="nc" id="L370">				saveMap = new MapEditor(mapWidthInput, mapHeightInput, userCreatedMap.arrangePathPoint(mapPoints));</span>
+<span class="nc" id="L371">				saveMap.writeFile(mapNameInput);</span>
+<span class="nc" id="L372">				mapCreated = true;</span>
+<span class="nc" id="L373">				statusString = &quot;Map successfully created&quot;;</span>
+
+<span class="nc" id="L375">			}</span>
+			else{
+<span class="nc" id="L377">				statusString = &quot;Invalid Map. Please try again&quot;;</span>
+<span class="nc" id="L378">				reInitializeMapPathCreation();</span>
+			}
+		}
+
+
+<span class="nc" id="L383">	}</span>
+
+	public void reInitializeMapPathCreation(){
+<span class="nc" id="L386">		mapPoints = new ArrayList&lt;Integer&gt;();</span>
+<span class="nc" id="L387">		startingPointAccepted=false;</span>
+<span class="nc" id="L388">		exitPointAccepted = false;</span>
+<span class="nc" id="L389">		mapCreated = false;</span>
+<span class="nc" id="L390">		userCreatedMap = new Map();</span>
+<span class="nc" id="L391">		userCreatedMap.setMapSize(mapWidthInput, mapHeightInput);</span>
+<span class="nc" id="L392">		userCreatedMap.initializeMap();</span>
+<span class="nc" id="L393">	}</span>
+
+	public void generateMapGrid(){
+
+<span class="nc" id="L397">		int currentX = mapDrawOffsetX;</span>
+<span class="nc" id="L398">		int currentY = mapDrawOffsetY;</span>
+<span class="nc bnc" id="L399" title="All 2 branches missed.">		for(int y = 0 ; y &lt; mapHeightInput; y++){</span>
+<span class="nc bnc" id="L400" title="All 2 branches missed.">			for(int x = 0 ; x &lt; mapWidthInput; x++ ){</span>
+<span class="nc" id="L401">				BlackTileBoundaryGraphic.draw(currentX, currentY);</span>
+<span class="nc bnc" id="L402" title="All 6 branches missed.">				if(mapInputAccepted&amp;&amp;startingPointAccepted&amp;&amp;exitPointAccepted)</span>
+<span class="nc bnc" id="L403" title="All 4 branches missed.">					if(x ==selectedTileX ||y == selectedTileY)</span>
+<span class="nc" id="L404">						BluePathTileGraphic.draw(currentX, currentY);</span>
+<span class="nc" id="L405">				currentX+=32;</span>
+			}
+<span class="nc" id="L407">			currentY+=32;</span>
+<span class="nc" id="L408">			currentX=mapDrawOffsetX;</span>
+		}
+
+<span class="nc" id="L411">	}</span>
+
+
+	public void reInitialize(){
+<span class="nc" id="L415">		mapWidthTextField.setText(&quot;&quot;);</span>
+<span class="nc" id="L416">		mapWidthTextField.setAcceptingInput(true);</span>
+
+<span class="nc" id="L418">		mapHeightTextField.setText(&quot;&quot;);</span>
+<span class="nc" id="L419">		mapHeightTextField.setAcceptingInput(true);</span>
+		
+<span class="nc" id="L421">		mapNameTextField.setText(&quot;&quot;);</span>
+<span class="nc" id="L422">		mapNameTextField.setAcceptingInput(true);</span>
+
+<span class="nc" id="L424">		mapWidthInput = 0;</span>
+<span class="nc" id="L425">		mapHeightInput = 0;</span>
+<span class="nc" id="L426">		mapNameInput =&quot;&quot;;</span>
+
+//		mapPoints = new ArrayList&lt;int[]&gt;();
+<span class="nc" id="L429">		mapPoints = new ArrayList&lt;Integer&gt;();</span>
+<span class="nc" id="L430">		mapInputAccepted = false;</span>
+<span class="nc" id="L431">		startingPointAccepted=false;</span>
+<span class="nc" id="L432">		exitPointAccepted = false;</span>
+<span class="nc" id="L433">		mapCreated = false;</span>
+<span class="nc" id="L434">		statusString =&quot;&quot;;</span>
+<span class="nc" id="L435">	}</span>
+
+	public void createRectangleButtons(GameContainer container){
+<span class="nc" id="L438">		CreateMapButton = new Rectangle(mapHeightTextField.getX() + ttf.getWidth(widthString)+10, 40 + mapWidthTextField.getHeight()/2 ,CreateMapButtonGraphic.getWidth(), CreateMapButtonGraphic.getHeight());</span>
+<span class="nc" id="L439">		ExitGameButton = new Rectangle(container.getWidth()-ExitButtonGraphic.getWidth(), container.getHeight()-ExitButtonGraphic.getHeight()-2, ExitButtonGraphic.getWidth(),ExitButtonGraphic.getHeight());</span>
+<span class="nc" id="L440">		SaveMapButton = new Rectangle(container.getWidth()/2 - SaveMapButtonGraphic.getWidth()/2, container.getHeight() - SaveMapButtonGraphic.getHeight() -10, SaveMapButtonGraphic.getWidth(), SaveMapButtonGraphic.getHeight());</span>
+<span class="nc" id="L441">	}</span>
+
+	@Override
+	public int getID() {
+		// TODO Auto-generated method stub
+<span class="nc" id="L446">		return 2;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 28, 2025 8:22:47 PM)</div></body></html>

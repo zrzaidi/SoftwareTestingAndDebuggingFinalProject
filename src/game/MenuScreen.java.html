@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>MenuScreen.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 28, 2025 8:22:47 PM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">game</a> &gt; <span class="el_source">MenuScreen.java</span></div><h1>MenuScreen.java</h1><pre class="source lang-java linenums">package game;
+
+
+
+import org.lwjgl.input.Mouse;
+import org.newdawn.slick.*;
+import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.state.BasicGameState;
+import org.newdawn.slick.state.StateBasedGame;
+
+import critters.Critter;
+public class MenuScreen extends BasicGameState{
+
+	Image SandTileGraphic;
+	Image StartGameButtonGraphic;
+	Image EditMapButtonGraphic;
+	Image TowerDefenseTitleGraphic;
+	Image ExitButtonGraphic;
+	Rectangle StartGameButton;
+	Rectangle ExitGameButton;
+	Rectangle EditMapButton;
+	
+<span class="fc" id="L23">	private final String authors = &quot;A Java Game by Callum May, Wei Wang,\nCharles Liu and Robert Zhao&quot;;</span>
+
+<span class="fc" id="L25">	private final int mouseClickDelay = 200;</span>
+<span class="fc" id="L26">	private long lastClick=(-1*mouseClickDelay);</span>
+
+<span class="fc" id="L28">	public MenuScreen (int state){</span>
+
+<span class="fc" id="L30">	}</span>
+
+
+	@Override
+	public void init(GameContainer container, StateBasedGame sbg) throws SlickException {
+
+<span class="nc" id="L36">		loadImagesAndAnimations();</span>
+<span class="nc" id="L37">		createRectangleButtons(container);</span>
+
+<span class="nc" id="L39">	}</span>
+
+	@Override
+	public void update(GameContainer container, StateBasedGame sbg, int delta) throws SlickException {
+
+
+<span class="nc bnc" id="L45" title="All 2 branches missed.">		if(Mouse.isButtonDown(0)){</span>
+<span class="nc" id="L46">			mouseClicked(Mouse.getX(), container.getHeight()- Mouse.getY(), sbg, container);</span>
+		}
+
+<span class="nc" id="L49">	}</span>
+
+	@Override
+	public void render(GameContainer container, StateBasedGame sbg, Graphics g) throws SlickException {
+
+<span class="nc" id="L54">		drawMapAndOverlay(container);</span>
+<span class="nc" id="L55">		g.setColor(Color.black);</span>
+<span class="nc" id="L56">		g.drawString(authors, 5, container.getHeight()-40);</span>
+<span class="nc" id="L57">	}</span>
+
+
+	public void drawMapAndOverlay(GameContainer container){
+<span class="nc bnc" id="L61" title="All 2 branches missed.">		for(int x = 0; x &lt;container.getWidth(); x+=SandTileGraphic.getWidth()){</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">			for(int y = 0 ; y&lt; container.getHeight(); y+=SandTileGraphic.getHeight()){</span>
+<span class="nc" id="L63">				SandTileGraphic.draw(x,y);</span>
+			}
+		}
+
+<span class="nc" id="L67">		StartGameButtonGraphic.draw(container.getWidth()/2 -StartGameButtonGraphic.getWidth()/2, container.getHeight()/3 -StartGameButtonGraphic.getHeight()/2);</span>
+<span class="nc" id="L68">		EditMapButtonGraphic.draw(container.getWidth()/2 -EditMapButtonGraphic.getWidth()/2, container.getHeight()/2 -EditMapButtonGraphic.getHeight()/2);</span>
+<span class="nc" id="L69">		TowerDefenseTitleGraphic.draw(container.getWidth()/2 - TowerDefenseTitleGraphic.getWidth()/2, TowerDefenseTitleGraphic.getHeight()/2);</span>
+		//ExitButtonGraphic.draw(container.getWidth()-ExitButtonGraphic.getWidth(), container.getHeight()-ExitButtonGraphic.getHeight()-2);
+
+<span class="nc" id="L72">	}</span>
+
+	public void createRectangleButtons(GameContainer container){
+<span class="fc" id="L75">		StartGameButton = new Rectangle(container.getWidth()/2 -StartGameButtonGraphic.getWidth()/2, container.getHeight()/3 -StartGameButtonGraphic.getHeight()/2, StartGameButtonGraphic.getWidth(), StartGameButtonGraphic.getHeight());</span>
+<span class="fc" id="L76">		ExitGameButton = new Rectangle(container.getWidth()-ExitButtonGraphic.getWidth(), container.getHeight()-ExitButtonGraphic.getHeight()-2, ExitButtonGraphic.getWidth(), ExitButtonGraphic.getHeight());</span>
+<span class="fc" id="L77">		EditMapButton = new Rectangle(container.getWidth()/2 -EditMapButtonGraphic.getWidth()/2, container.getHeight()/2 -EditMapButtonGraphic.getHeight()/2, EditMapButtonGraphic.getWidth(), EditMapButtonGraphic.getHeight()); </span>
+
+<span class="fc" id="L79">	}</span>
+
+	public void loadImagesAndAnimations() throws SlickException{
+<span class="nc" id="L82">		SandTileGraphic = new Image(&quot;graphics/SandTile.png&quot;);</span>
+<span class="nc" id="L83">		StartGameButtonGraphic = new Image(&quot;graphics/StartGameButton.png&quot;);</span>
+<span class="nc" id="L84">		EditMapButtonGraphic = new Image(&quot;graphics/EditMapButton.png&quot;);</span>
+<span class="nc" id="L85">		TowerDefenseTitleGraphic = new Image(&quot;graphics/TowerDefenseTitle.png&quot;);</span>
+<span class="nc" id="L86">		ExitButtonGraphic = new Image (&quot;graphics/ExitButton.png&quot;);</span>
+<span class="nc" id="L87">	}</span>
+
+	public void mouseClicked( float x, float y, StateBasedGame sbg, GameContainer container) throws SlickException{
+
+		//protection against multiple click registration
+<span class="fc bfc" id="L92" title="All 2 branches covered.">		if(lastClick + mouseClickDelay &gt; System.currentTimeMillis())</span>
+<span class="fc" id="L93">			return;</span>
+<span class="fc" id="L94">		lastClick = System.currentTimeMillis();</span>
+
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">		if(StartGameButton.contains(x, y)){</span>
+<span class="nc" id="L97">			MapSelectScreen s = (MapSelectScreen) sbg.getState(Game.mapSelectScreen);</span>
+<span class="nc" id="L98">			s.initializeAndLoadMaps();</span>
+<span class="nc" id="L99">			s.createRectangleMapButtons(container);</span>
+			
+			try {
+<span class="nc" id="L102">			    Thread.sleep(300);                </span>
+<span class="nc" id="L103">			} catch(InterruptedException ex) {</span>
+<span class="nc" id="L104">			    Thread.currentThread().interrupt();</span>
+			}
+
+<span class="nc" id="L107">			sbg.enterState(Game.mapSelectScreen);</span>
+		}
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">		if(EditMapButton.contains(x, y)){</span>
+<span class="nc" id="L110">			EditMapScreen s = (EditMapScreen) sbg.getState(Game.editMapScreen);</span>
+<span class="nc" id="L111">			AppGameContainer gameContainer = (AppGameContainer) container;</span>
+<span class="nc" id="L112">			gameContainer.setDisplayMode(832, 832, false);</span>
+<span class="nc" id="L113">			s.createRectangleButtons(container);</span>
+
+<span class="nc" id="L115">			sbg.enterState(Game.editMapScreen);</span>
+
+		}
+
+<span class="fc" id="L119">	}</span>
+
+	@Override
+	public int getID() {
+		// TODO Auto-generated method stub
+<span class="nc" id="L124">		return 0;</span>
+	}
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 28, 2025 8:22:47 PM)</div></body></html>

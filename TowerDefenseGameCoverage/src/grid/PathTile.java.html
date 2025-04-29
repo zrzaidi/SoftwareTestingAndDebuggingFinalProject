@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>PathTile.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 28, 2025 8:22:47 PM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">grid</a> &gt; <span class="el_source">PathTile.java</span></div><h1>PathTile.java</h1><pre class="source lang-java linenums">package grid;
+
+/**
+ * PathTiles are the components of the design path
+ * 
+ * @author		Wei Wang
+ * @version		1.0
+ * @since		2015-02-28
+ */
+
+public class PathTile extends Tile{
+	
+	private PathTile nextTile;
+	
+	/**
+	 * Create new PathTile based on given coordinates
+	 * 
+	 * @param x		X-coordinate related to the one of Map
+	 * @param y		Y-coordinate related to the one of Map
+	 * @param type	Type of Path beside the entry and exit is set as &quot;------&quot;
+	 */
+	public PathTile(int x, int y) {
+<span class="fc" id="L23">		super(x, y);</span>
+		
+<span class="fc" id="L25">		super.setType(1);</span>
+
+<span class="fc" id="L27">		nextTile = null;</span>
+<span class="fc" id="L28">	}</span>
+	
+	/**
+	 * Make a link between the current PathTile and the next one
+	 * 
+	 * @param nextTile		The next PathTile according to the current one
+	 */
+	public void setNextTile(PathTile nextTile) {
+<span class="fc" id="L36">		this.nextTile = nextTile;</span>
+<span class="fc" id="L37">	}</span>
+	
+	/**
+	 * Lead the pointer to the next PathTile
+	 * 
+	 * @return the next linked PathTile
+	 */
+	public PathTile getNextTile() {
+<span class="fc" id="L45">		return nextTile;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 28, 2025 8:22:47 PM)</div></body></html>

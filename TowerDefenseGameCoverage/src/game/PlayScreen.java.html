@@ -1,0 +1,788 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>PlayScreen.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 28, 2025 8:22:47 PM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">game</a> &gt; <span class="el_source">PlayScreen.java</span></div><h1>PlayScreen.java</h1><pre class="source lang-java linenums">package game;
+
+
+import java.awt.Font;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+
+
+
+
+
+
+
+
+
+
+
+
+import org.lwjgl.input.Mouse;
+import org.newdawn.slick.Animation;
+import org.newdawn.slick.AppGameContainer;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
+import org.newdawn.slick.TrueTypeFont;
+import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.state.BasicGameState;
+import org.newdawn.slick.state.StateBasedGame;
+
+import towers.*;
+import towers.Projectile.projectileType;
+import grid.*;
+import map.*;
+import critters.Critter;
+import critters.Critter.direction;
+import critters.CritterGenerator;
+
+
+public class PlayScreen extends BasicGameState {
+
+
+<span class="fc" id="L46">	private static Queue&lt;Critter&gt; critterQueue = new LinkedList&lt;Critter&gt;();</span>
+<span class="fc" id="L47">	private static Queue&lt;Critter&gt; activeCritterQueue = new LinkedList&lt;Critter&gt;();</span>
+<span class="fc" id="L48">	private static ArrayList&lt;Tower&gt; towerList = new ArrayList&lt;Tower&gt;();</span>
+<span class="fc" id="L49">	private static ArrayList&lt;Projectile&gt; projectileList = new ArrayList&lt;Projectile&gt;();</span>
+	ArrayList&lt;Projectile&gt; pToRemove;
+<span class="fc" id="L51">	static long tickCount = 0;</span>
+
+<span class="fc" id="L53">	private final int mouseClickDelay = 200;</span>
+<span class="fc" id="L54">	private long lastClick=(-1*mouseClickDelay);</span>
+
+	private SpriteSheet blackBeetleSpriteSheet;
+	Animation blackBeetleAnimation;
+	private SpriteSheet batSpriteSheet;
+	Animation batAnimation;
+	private SpriteSheet scorpionSpriteSheet;
+	Animation scorpionAnimation;
+	private SpriteSheet zombieSpriteSheet;
+	Animation zombieAnimation;
+	private SpriteSheet bossSpriteSheet;
+	Animation bossAnimation;
+
+	Image SandTileGraphic;
+	Image GravelTileGraphic;
+	Image BrickTileGraphic;
+
+	Image BuyTowerTitleGraphic;
+	Image TowerMenuOverlayGraphic;
+	Image ExitButtonGraphic;
+	Image UpgradeButtonGraphic;
+	Image SellButtonGraphic;
+	Image TileSelectGraphic;
+	Image UpgradeSelectGraphic;
+	Image SellSelectGraphic;
+	Image CurrencyGraphic;
+	Image WaveGraphic;
+	Image NextWaveActiveGraphic; 
+	Image NextWaveNonActiveGraphic;
+	Image HeartGraphic;
+
+	Image TowerTileGraphic;
+	Image BasicTowerGraphic;
+	Image BasicTowerProjectileGraphic;
+	Image FreezeTowerGraphic;
+	Image FreezeTowerProjectileGraphic;
+	Image SniperTowerGraphic;
+	Image SniperTowerProjectileGraphic;
+
+
+
+	Rectangle ExitButton;
+	Rectangle NextWaveButton;
+	Rectangle SellButton;
+	Rectangle UpgradeButton;
+
+
+	private static Map currentMap;
+<span class="fc" id="L102">	private final int sideMenuWidth = 192;</span>
+<span class="fc" id="L103">	private final int bottomMenuWidth = 128;</span>
+
+<span class="fc" id="L105">	private final int towerGraphicYStart = 58;</span>
+<span class="fc" id="L106">	private final int towerGraphicXStart = 20;</span>
+<span class="fc" id="L107">	private final int towerGraphicYOffset = 79;</span>
+<span class="fc" id="L108">	private final int towerGraphicXOffset = 83;</span>
+<span class="fc" id="L109">	private final int towerButtonWidth = 66;</span>
+<span class="fc" id="L110">	private final int towerButtonHeight = 66;</span>
+<span class="fc" id="L111">	private final int maximumNumberTowers = 3; //no more than 4</span>
+
+	//which tower player is placing, corresponds to position in towerList. -1 = no tower selected
+<span class="fc" id="L114">	private static int selectedTower =-1;</span>
+
+	private ArrayList&lt;Image&gt; TowerGraphics;
+	private ArrayList&lt;Rectangle&gt; TowerGraphicButtonsList;
+
+<span class="fc" id="L119">	private final int startingLevel = 1;</span>
+<span class="fc" id="L120">	private final int critterSpawnDelay = 20;</span>
+	CritterGenerator generator;
+	private static int currentLevel;
+<span class="fc" id="L123">	private static boolean waveIsInProgress;</span>
+<span class="fc" id="L124">	private boolean gameOver = false;</span>
+
+	Font font ;
+	TrueTypeFont ttf;
+
+<span class="fc" id="L129">	public PlayScreen (int state){</span>
+
+<span class="fc" id="L131">	}</span>
+
+
+	@Override
+	public void init(GameContainer container, StateBasedGame sbg) throws SlickException {
+
+<span class="nc" id="L137">		loadImages();</span>
+<span class="nc" id="L138">		loadAnimations();</span>
+<span class="nc" id="L139">		loadFonts();</span>
+
+<span class="nc" id="L141">		restartGame();</span>
+<span class="nc" id="L142">	}</span>
+
+	@Override
+	public void update(GameContainer container, StateBasedGame sbg, int delta) throws SlickException {
+		
+<span class="nc bnc" id="L147" title="All 2 branches missed.">			if(waveIsInProgress){</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">				if(critterQueue.size()!=0){</span>
+<span class="nc" id="L149">					addCrittersToActiveCritterQueue();</span>
+				}
+<span class="nc bnc" id="L151" title="All 2 branches missed.">				if(!gameOver){</span>
+<span class="nc" id="L152">				updateProjectiles();			</span>
+<span class="nc" id="L153">				updateCritters();</span>
+<span class="nc" id="L154">				targetCritters();</span>
+<span class="nc" id="L155">				attackCritters();</span>
+				}
+			}
+
+
+<span class="nc bnc" id="L160" title="All 2 branches missed.">			if(Mouse.isButtonDown(0)){</span>
+<span class="nc" id="L161">				mouseClicked(Mouse.getX(), container.getHeight() - Mouse.getY(), sbg, container);</span>
+			}
+			
+<span class="nc bnc" id="L164" title="All 2 branches missed.">			if(Player.getPlayer().getLives()&lt;=0){</span>
+<span class="nc" id="L165">				gameOver = true;</span>
+				}
+
+
+<span class="nc bnc" id="L169" title="All 2 branches missed.">			if(!gameOver){</span>
+<span class="nc" id="L170">			blackBeetleAnimation.update(delta);</span>
+<span class="nc" id="L171">			batAnimation.update(delta);</span>
+<span class="nc" id="L172">			scorpionAnimation.update(delta);</span>
+<span class="nc" id="L173">			zombieAnimation.update(delta);</span>
+<span class="nc" id="L174">			bossAnimation.update(delta);</span>
+			}
+<span class="nc" id="L176">	}</span>
+
+
+
+	@Override
+	public void render(GameContainer container, StateBasedGame sbg, Graphics g) throws SlickException {
+		
+<span class="nc" id="L183">			drawMapandOverlay(container, g);</span>
+<span class="nc" id="L184">			drawTowers(g);</span>
+
+<span class="nc bnc" id="L186" title="All 2 branches missed.">			if(waveIsInProgress){</span>
+<span class="nc" id="L187">				drawCritters(); </span>
+<span class="nc" id="L188">				drawProjectiles();</span>
+			}		
+
+
+			
+<span class="nc bnc" id="L193" title="All 2 branches missed.">			if(gameOver){</span>
+<span class="nc" id="L194">			font = new Font(&quot;Verdana&quot;, Font.PLAIN, 40);</span>
+<span class="nc" id="L195">			ttf = new TrueTypeFont(font, true); </span>
+<span class="nc" id="L196">			ttf.drawString(20, 60, &quot;GAME OVER&quot;, Color.black);</span>
+<span class="nc" id="L197">			font = new Font(&quot;Verdana&quot;, Font.PLAIN, 26);</span>
+<span class="nc" id="L198">			ttf = new TrueTypeFont(font, true); </span>
+			}
+			
+			
+<span class="nc" id="L202">	}</span>
+
+
+	private void drawTowers( Graphics g){
+<span class="pc bpc" id="L206" title="1 of 2 branches missed.">		for(Tower t: towerList){</span>
+
+<span class="nc" id="L208">			Image img = BasicTowerGraphic;</span>
+<span class="nc bnc" id="L209" title="All 4 branches missed.">			switch(t.getType()){</span>
+			case FREEZE:
+<span class="nc" id="L211">				img = FreezeTowerGraphic;</span>
+<span class="nc" id="L212">				break;</span>
+			case GENERIC:
+				//do nothing
+<span class="nc" id="L215">				break;</span>
+			case SNIPER:
+<span class="nc" id="L217">				img = SniperTowerGraphic;</span>
+<span class="nc" id="L218">				break;</span>
+			default:
+				//do nothing
+				break;
+
+			}
+
+<span class="nc" id="L225">			img.setRotation( (float) t.getRotationAngleInDegrees());</span>
+<span class="nc" id="L226">			img.drawCentered( (float) t.getXLoc(), (float) t.getYLoc());</span>
+<span class="nc bnc" id="L227" title="All 2 branches missed.">			for(int count = 1; count &lt; t.getLevel() ;count++){</span>
+<span class="nc" id="L228">				g.setColor(Color.blue);</span>
+<span class="nc" id="L229">				g.fillOval( (float) (t.getXLoc()- 5 +(count-1)*5), (float) (t.getYLoc())+12, (float) 5.0,(float) 5.0);</span>
+				
+			}
+		}
+<span class="fc" id="L233">	}</span>
+	private void drawProjectiles(){
+<span class="nc bnc" id="L235" title="All 2 branches missed.">		for(Projectile p: projectileList){</span>
+			Image img;
+<span class="nc bnc" id="L237" title="All 4 branches missed.">			switch(p.getType()){</span>
+			case GENERIC:
+<span class="nc" id="L239">				img = BasicTowerProjectileGraphic;</span>
+<span class="nc" id="L240">				break;</span>
+			case FREEZE:
+<span class="nc" id="L242">				img = FreezeTowerProjectileGraphic;</span>
+<span class="nc" id="L243">				break;</span>
+			case SNIPER:
+<span class="nc" id="L245">				img = SniperTowerProjectileGraphic;</span>
+<span class="nc" id="L246">				break;</span>
+			default:
+<span class="nc" id="L248">				img = BasicTowerProjectileGraphic;</span>
+				break;
+			}
+<span class="nc" id="L251">			img.setRotation( (float) p.angleOfProjectileInDegrees());</span>
+<span class="nc" id="L252">			img.drawCentered((float)p.getX(),(float)p.getY());</span>
+		}
+<span class="nc" id="L254">	}</span>
+	public void drawCritters(){
+<span class="nc bnc" id="L256" title="All 2 branches missed.">		for(Critter s : activeCritterQueue)</span>
+			//this method draws critters depending on if they are alive or not
+<span class="nc bnc" id="L258" title="All 4 branches missed.">			if(s.isVisible()&amp;&amp;s.isAlive())</span>
+			{
+<span class="nc" id="L260">				drawCritter(s);</span>
+
+			}
+
+<span class="nc" id="L264">	}</span>
+
+
+	private void drawCritter(Critter s){
+		Animation a;
+<span class="nc" id="L269">		int orientationOffset = 0;</span>
+<span class="nc bnc" id="L270" title="All 6 branches missed.">		switch(s.getType()){</span>
+		case GRUNT:
+<span class="nc" id="L272">			a = zombieAnimation;</span>
+<span class="nc" id="L273">			orientationOffset =0;</span>
+<span class="nc" id="L274">			break;</span>
+		case SCOUT:
+<span class="nc" id="L276">			a = batAnimation;</span>
+<span class="nc" id="L277">			orientationOffset = 2;</span>
+<span class="nc" id="L278">			break;</span>
+		case ARMORED:
+<span class="nc" id="L280">			a = blackBeetleAnimation;</span>
+<span class="nc" id="L281">			orientationOffset =0;</span>
+<span class="nc" id="L282">			break;</span>
+		case TANK:
+
+<span class="nc" id="L285">			a = scorpionAnimation;</span>
+<span class="nc" id="L286">			orientationOffset = 2;</span>
+<span class="nc" id="L287">			break;</span>
+		case BOSS:
+<span class="nc" id="L289">			a = bossAnimation;</span>
+<span class="nc" id="L290">			orientationOffset=2;</span>
+<span class="nc" id="L291">			break;</span>
+		default:
+<span class="nc" id="L293">			a= blackBeetleAnimation;</span>
+			break;
+
+
+		}
+
+<span class="nc bnc" id="L299" title="All 2 branches missed.">		if(s.getCritterDirection()==direction.RIGHT){</span>
+<span class="nc" id="L300">			a.getCurrentFrame().setRotation(90*((3+orientationOffset)%4));</span>
+<span class="nc" id="L301">			a.getCurrentFrame().drawCentered(s.getXLoc(), s.getYLoc());</span>
+		}
+<span class="nc bnc" id="L303" title="All 2 branches missed.">		if(s.getCritterDirection()==direction.LEFT){</span>
+<span class="nc" id="L304">			a.getCurrentFrame().setRotation(90*((1+orientationOffset)%4));</span>
+<span class="nc" id="L305">			a.getCurrentFrame().drawCentered(s.getXLoc(), s.getYLoc());</span>
+
+		}
+<span class="nc bnc" id="L308" title="All 2 branches missed.">		if(s.getCritterDirection()==direction.DOWN){</span>
+<span class="nc" id="L309">			a.getCurrentFrame().setRotation(90*((0+orientationOffset)%4));</span>
+<span class="nc" id="L310">			a.getCurrentFrame().drawCentered(s.getXLoc(), s.getYLoc());</span>
+		}
+
+<span class="nc bnc" id="L313" title="All 2 branches missed.">		if(s.getCritterDirection()==direction.UP){</span>
+<span class="nc" id="L314">			a.getCurrentFrame().setRotation(90*((2+orientationOffset)%4));</span>
+<span class="nc" id="L315">			a.getCurrentFrame().drawCentered(s.getXLoc(), s.getYLoc());</span>
+		}
+
+<span class="nc" id="L318">	}</span>
+
+
+	private void drawMapandOverlay(GameContainer container, Graphics g){
+		//draw map and background
+<span class="nc bnc" id="L323" title="All 2 branches missed.">		for(int i = 0 ; i &lt; container.getWidth()/32 ; i++){</span>
+<span class="nc bnc" id="L324" title="All 2 branches missed.">			for(int j = 0 ; j &lt; container.getHeight()/32 ; j++){</span>
+<span class="nc bnc" id="L325" title="All 4 branches missed.">				if(i&lt;currentMap.getWidthOfMap() &amp;&amp;j &lt; currentMap.getHeightOfMap()){</span>
+
+<span class="nc bnc" id="L327" title="All 2 branches missed.">					if (currentMap.getTile(i, j) instanceof PathTile){	</span>
+<span class="nc" id="L328">						GravelTileGraphic.draw(i * currentMap.getPixelSize(), j * currentMap.getPixelSize());</span>
+<span class="nc" id="L329">						continue;</span>
+					}
+<span class="nc bnc" id="L331" title="All 2 branches missed.">					if (currentMap.getTile(i, j) instanceof MapTile){		</span>
+<span class="nc" id="L332">						SandTileGraphic.draw(i * currentMap.getPixelSize(), j * currentMap.getPixelSize());</span>
+<span class="nc" id="L333">						continue;</span>
+					}
+
+				}
+<span class="nc" id="L337">				BrickTileGraphic.draw(i * currentMap.getPixelSize(), j * currentMap.getPixelSize());</span>
+			}
+		}
+
+		//draw the hearts
+<span class="nc bnc" id="L342" title="All 2 branches missed.">		for(int x = 0 ; x &lt; Player.getPlayer().getLives() ; x++){</span>
+<span class="nc bnc" id="L343" title="All 2 branches missed.">			if(x&lt;8)</span>
+<span class="nc" id="L344">				HeartGraphic.draw(x * (5 + HeartGraphic.getWidth()), currentMap.getHeightOfMap() * currentMap.getPixelSize() + 5);</span>
+			else{
+<span class="nc" id="L346">				HeartGraphic.draw((x - 8) * (5 + HeartGraphic.getWidth()), currentMap.getHeightOfMap() * currentMap.getPixelSize() + 15 + HeartGraphic.getHeight());</span>
+			}
+		}
+
+
+		//drawing buttons and overlays
+<span class="nc" id="L352">		TowerMenuOverlayGraphic.draw(currentMap.getWidthInPixel(), 0);</span>
+<span class="nc" id="L353">		ExitButtonGraphic.draw(container.getWidth() - ExitButtonGraphic.getWidth(), container.getHeight() - ExitButtonGraphic.getHeight() - 2);</span>
+<span class="nc" id="L354">		WaveGraphic.draw(currentMap.getWidthInPixel() - WaveGraphic.getWidth(), currentMap.getHeightInPixel());</span>
+<span class="nc" id="L355">		CurrencyGraphic.draw(0, container.getHeight() - CurrencyGraphic.getHeight()-5);</span>
+		//change wavebutton graphic
+<span class="nc bnc" id="L357" title="All 4 branches missed.">		if(!waveIsInProgress &amp;&amp;!gameOver)</span>
+<span class="nc" id="L358">			NextWaveActiveGraphic.draw(currentMap.getWidthInPixel() - WaveGraphic.getWidth(), currentMap.getHeightInPixel() + WaveGraphic.getHeight() + 10);</span>
+		else
+<span class="nc" id="L360">			NextWaveNonActiveGraphic.draw(currentMap.getWidthInPixel() - WaveGraphic.getWidth(), currentMap.getHeightInPixel() + WaveGraphic.getHeight() + 10);</span>
+
+
+		//draw tower graphics
+<span class="nc bnc" id="L364" title="All 2 branches missed.">		for (int i =0;i&lt;maximumNumberTowers;i++){</span>
+<span class="nc" id="L365">			int xCorner = currentMap.getWidthInPixel() +towerGraphicXStart + ((i)%2)*towerGraphicXOffset;</span>
+<span class="nc" id="L366">			int yCorner = towerGraphicYStart + (i/2)*towerGraphicYOffset;</span>
+			Image img;
+<span class="nc bnc" id="L368" title="All 4 branches missed.">			switch(i){</span>
+			case 0:
+<span class="nc" id="L370">				img = BasicTowerGraphic;</span>
+<span class="nc" id="L371">				break;</span>
+			case 1:
+<span class="nc" id="L373">				img = FreezeTowerGraphic;</span>
+<span class="nc" id="L374">				break;</span>
+			case 2:
+<span class="nc" id="L376">				img = SniperTowerGraphic;</span>
+<span class="nc" id="L377">				break;</span>
+			default:
+<span class="nc" id="L379">				img = BasicTowerGraphic;</span>
+				break;
+			}
+<span class="nc" id="L382">			img.setRotation(0);</span>
+<span class="nc" id="L383">			img.drawCentered(xCorner +towerButtonWidth/2,yCorner +towerButtonHeight/2);</span>
+
+
+
+		}
+		//draw sell and upgrade buttons
+<span class="nc" id="L389">		int xCorner = currentMap.getWidthInPixel() +towerGraphicXStart + ((4)%2)*towerGraphicXOffset;</span>
+<span class="nc" id="L390">		int yCorner = towerGraphicYStart + (4/2)*towerGraphicYOffset;</span>
+<span class="nc" id="L391">		SellButtonGraphic.drawCentered(xCorner +towerButtonWidth/2,yCorner +towerButtonHeight/2);</span>
+
+<span class="nc" id="L393">		xCorner = currentMap.getWidthInPixel() +towerGraphicXStart + ((5)%2)*towerGraphicXOffset;</span>
+<span class="nc" id="L394">		yCorner = towerGraphicYStart + (5/2)*towerGraphicYOffset;</span>
+<span class="nc" id="L395">		UpgradeButtonGraphic.drawCentered(xCorner +towerButtonWidth/2,yCorner +towerButtonHeight/2);</span>
+
+		// drawing/updating the currency and level
+<span class="nc" id="L398">		ttf.drawString( CurrencyGraphic.getWidth() + 5, (container.getHeight() - 40), &quot;&quot; + Player.getPlayer().getCredits());</span>
+<span class="nc" id="L399">		ttf.drawString(currentMap.getWidthInPixel() - 48, currentMap.getHeightInPixel() + 15, currentLevel + &quot;&quot;);</span>
+
+		//if the mouse is on the map, snap to map grid
+<span class="nc bnc" id="L402" title="All 2 branches missed.">		if(mouseOnMap(Mouse.getX(),container.getHeight()-Mouse.getY())){</span>
+			Image img;
+<span class="nc bnc" id="L404" title="All 7 branches missed.">			switch(selectedTower){</span>
+			case -3:
+<span class="nc" id="L406">				img = SellSelectGraphic;</span>
+<span class="nc" id="L407">				break;</span>
+			case -2:
+<span class="nc" id="L409">				img = UpgradeSelectGraphic;</span>
+<span class="nc" id="L410">				break;</span>
+			case -1:
+<span class="nc" id="L412">				img = TileSelectGraphic;</span>
+<span class="nc" id="L413">				break; </span>
+			case 0:
+<span class="nc" id="L415">				img = BasicTowerGraphic;</span>
+<span class="nc" id="L416">				break;</span>
+			case 1:
+<span class="nc" id="L418">				img =  FreezeTowerGraphic;</span>
+<span class="nc" id="L419">				break;</span>
+			case 2:
+<span class="nc" id="L421">				img = SniperTowerGraphic;</span>
+<span class="nc" id="L422">				break;</span>
+			default:
+<span class="nc" id="L424">				img = TileSelectGraphic;</span>
+				break;
+			}
+<span class="nc" id="L427">			img.drawCentered(getClosestTileCenter(Mouse.getX()), container.getHeight() - getClosestTileCenter(Mouse.getY()));</span>
+		}
+<span class="nc" id="L429">	}</span>
+
+	//for each tower in the tower list, find its closest target
+	public void targetCritters(){
+<span class="nc bnc" id="L433" title="All 2 branches missed.">		for(Tower t : towerList){</span>
+<span class="nc" id="L434">			t.setTargetCritter(null);</span>
+<span class="nc bnc" id="L435" title="All 2 branches missed.">			for(Critter c: activeCritterQueue){</span>
+<span class="nc bnc" id="L436" title="All 4 branches missed.">				if(c.isAlive()&amp;&amp;c.isVisible()){</span>
+					//calculate distance
+<span class="nc" id="L438">					double xDist= Math.abs(c.getXLoc() - t.getXLoc());</span>
+<span class="nc" id="L439">					double yDist= Math.abs(c.getYLoc() -  t.getYLoc());</span>
+<span class="nc" id="L440">					double dist = Math.sqrt((xDist*xDist)+(yDist*yDist));</span>
+<span class="nc bnc" id="L441" title="All 4 branches missed.">					if(dist&lt;t.getRange() &amp;&amp; t.getCritterTravelDistanceMaximum()&lt; c.getDistanceTravelled()){</span>
+<span class="nc" id="L442">						t.setTargetCritter(c);</span>
+<span class="nc" id="L443">						t.setCritterTravelDistanceMaximum(c.getDistanceTravelled());</span>
+
+					}
+				}
+
+			}
+<span class="nc" id="L449">			t.setCritterTravelDistanceMaximum(0);</span>
+		}
+<span class="nc" id="L451">	}</span>
+
+	//for each tower, attack the critter its suppose to attack, if it is able to
+	public void attackCritters(){
+<span class="nc bnc" id="L455" title="All 2 branches missed.">		for(Tower t: towerList){</span>
+<span class="nc bnc" id="L456" title="All 4 branches missed.">			if(t.getTargetCritter()!= null &amp;&amp;t.canAttack()){</span>
+<span class="nc" id="L457">				attackCritter(t);</span>
+<span class="nc" id="L458">				t.setTimeOfLastAttack(System.currentTimeMillis());</span>
+			}
+		}
+<span class="nc" id="L461">	}</span>
+
+
+	public void attackCritter(Tower source){
+<span class="nc" id="L465">		projectileType projType = projectileType.GENERIC;</span>
+<span class="nc bnc" id="L466" title="All 4 branches missed.">		switch(source.getType()){</span>
+		case GENERIC:
+<span class="nc" id="L468">			projType = projectileType.GENERIC;</span>
+<span class="nc" id="L469">			break;</span>
+		case SNIPER:
+<span class="nc" id="L471">			projType = projectileType.SNIPER;</span>
+<span class="nc" id="L472">			break;</span>
+		case FREEZE:
+<span class="nc" id="L474">			projType = projectileType.FREEZE;</span>
+<span class="nc" id="L475">			break;</span>
+		default:
+			break;
+		}
+<span class="nc" id="L479">		Projectile projectile = new Projectile(source.getXLoc(), source.getYLoc(), (double)source.getTargetCritter().getXLoc(), </span>
+<span class="nc" id="L480">				(double)source.getTargetCritter().getYLoc(), source.getPower(), source.getTargetCritter(), projType, source.getLevel());</span>
+<span class="nc" id="L481">		projectileList.add(projectile);</span>
+<span class="nc" id="L482">	}</span>
+	
+	public void reloadTowers(){
+<span class="nc bnc" id="L485" title="All 2 branches missed.">		for(Tower t : towerList){</span>
+<span class="nc" id="L486">			t.setTimeOfLastAttack(0);</span>
+		}
+<span class="nc" id="L488">	}</span>
+
+	public void loadImages() throws SlickException{
+		//initialize all graphics/images from graphics folder
+<span class="nc" id="L492">		SandTileGraphic = new Image(&quot;graphics/SandTile.png&quot;);</span>
+<span class="nc" id="L493">		GravelTileGraphic = new Image (&quot;graphics/GravelTile.png&quot;);</span>
+<span class="nc" id="L494">		BrickTileGraphic = new Image (&quot;graphics/BrickTile.png&quot;);</span>
+<span class="nc" id="L495">		ExitButtonGraphic = new Image (&quot;graphics/ExitButton.png&quot;);</span>
+<span class="nc" id="L496">		UpgradeButtonGraphic = new Image (&quot;graphics/UpgradeButtonGraphic.png&quot;);</span>
+<span class="nc" id="L497">		SellButtonGraphic = new Image (&quot;graphics/SellButtonGraphic.png&quot;);	</span>
+<span class="nc" id="L498">		UpgradeSelectGraphic = new Image(&quot;graphics/UpgradeSelectGraphic.png&quot;);</span>
+<span class="nc" id="L499">		SellSelectGraphic = new Image(&quot;graphics/SellSelectGraphic.png&quot;);</span>
+<span class="nc" id="L500">		CurrencyGraphic = new Image(&quot;graphics/CurrencyGraphic.png&quot;);</span>
+<span class="nc" id="L501">		TileSelectGraphic = new Image (&quot;graphics/TileSelectGraphic.png&quot;);</span>
+<span class="nc" id="L502">		UpgradeSelectGraphic = new Image(&quot;graphics/UpgradeSelectGraphic.png&quot;);</span>
+<span class="nc" id="L503">		SellSelectGraphic = new Image(&quot;graphics/SellSelectGraphic.png&quot;);</span>
+<span class="nc" id="L504">		WaveGraphic = new Image (&quot;graphics/WaveGraphic.png&quot;);</span>
+<span class="nc" id="L505">		NextWaveActiveGraphic = new Image(&quot;graphics/NextWaveActive.png&quot;);</span>
+<span class="nc" id="L506">		NextWaveNonActiveGraphic = new Image(&quot;graphics/NextWaveNonActive.png&quot;);</span>
+<span class="nc" id="L507">		HeartGraphic = new Image(&quot;graphics/Heart.png&quot;);</span>
+<span class="nc" id="L508">		TowerMenuOverlayGraphic = new Image(&quot;graphics/TowerMenuGraphic.png&quot;);</span>
+
+
+<span class="nc" id="L511">		BasicTowerGraphic = new Image(&quot;graphics/BasicTowerGraphic.png&quot;);</span>
+<span class="nc" id="L512">		BasicTowerProjectileGraphic = new Image(&quot;graphics/BasicTowerProjectileGraphic.png&quot;);</span>
+
+<span class="nc" id="L514">		FreezeTowerGraphic = new Image(&quot;graphics/FreezeTowerGraphic.png&quot;);</span>
+<span class="nc" id="L515">		FreezeTowerProjectileGraphic = new Image(&quot;graphics/FreezeTowerProjectileGraphic.png&quot;);</span>
+
+<span class="nc" id="L517">		SniperTowerGraphic = new Image (&quot;graphics/SniperTowerGraphic.png&quot;);</span>
+<span class="nc" id="L518">		SniperTowerProjectileGraphic = new Image (&quot;graphics/SniperTowerProjectileGraphic.png&quot;);</span>
+<span class="nc" id="L519">	}</span>
+
+	public void loadAnimations() throws SlickException{
+		//create sprite sheets and load them into the animation objects
+<span class="nc" id="L523">		batSpriteSheet = new SpriteSheet(&quot;graphics/batAnimationSheet.png&quot;,29,29,0);</span>
+<span class="nc" id="L524">		batAnimation = new Animation(batSpriteSheet,150);</span>
+<span class="nc" id="L525">		blackBeetleSpriteSheet = new SpriteSheet(&quot;graphics/beetleDownSheet.png&quot;, 28, 29,0);</span>
+<span class="nc" id="L526">		blackBeetleAnimation = new Animation(blackBeetleSpriteSheet, 100);</span>
+<span class="nc" id="L527">		scorpionSpriteSheet = new SpriteSheet(&quot;graphics/ScorpionSpriteSheet.png&quot;,37,32,0);</span>
+<span class="nc" id="L528">		scorpionAnimation = new Animation(scorpionSpriteSheet,100);</span>
+<span class="nc" id="L529">		zombieSpriteSheet = new SpriteSheet(&quot;graphics/ZombieSpriteSheet.png&quot;,32,26,0);</span>
+<span class="nc" id="L530">		zombieAnimation = new Animation(zombieSpriteSheet, 50);</span>
+<span class="nc" id="L531">		bossSpriteSheet = new SpriteSheet (&quot;graphics/BossCritterSpriteSheet.png&quot;,37,34,4);</span>
+<span class="nc" id="L532">		bossAnimation = new Animation(bossSpriteSheet,100);</span>
+<span class="nc" id="L533">	}</span>
+
+	public void loadFonts(){
+		//create a new font for the credit and level display
+<span class="nc" id="L537">		font = new Font(&quot;Verdana&quot;, Font.PLAIN, 26);</span>
+<span class="nc" id="L538">		ttf = new TrueTypeFont(font, true);</span>
+<span class="nc" id="L539">	}</span>
+
+	public void createRectangleButtons(GameContainer container){
+		//create the nextwave and exit rectangle buttons
+<span class="nc" id="L543">		ExitButton = new Rectangle(container.getWidth() - ExitButtonGraphic.getWidth(), container.getHeight() - ExitButtonGraphic.getHeight() - 2, ExitButtonGraphic.getWidth(), ExitButtonGraphic.getHeight());</span>
+<span class="nc" id="L544">		NextWaveButton = new Rectangle(currentMap.getWidthInPixel() - WaveGraphic.getWidth(), currentMap.getHeightInPixel() + WaveGraphic.getHeight() + 10, NextWaveActiveGraphic.getWidth(), NextWaveActiveGraphic.getHeight());</span>
+<span class="nc" id="L545">		SellButton = new Rectangle(currentMap.getWidthInPixel() +10, TowerMenuOverlayGraphic.getHeight() +  10, SellButtonGraphic.getWidth(), SellButtonGraphic.getHeight());</span>
+<span class="nc" id="L546">		UpgradeButton = new Rectangle(currentMap.getWidthInPixel() +10, TowerMenuOverlayGraphic.getHeight() + UpgradeButtonGraphic.getHeight()+ 20, NextWaveActiveGraphic.getWidth(), NextWaveActiveGraphic.getHeight());</span>
+
+		//create tower buttons
+<span class="nc" id="L549">		TowerGraphicButtonsList = new ArrayList&lt;Rectangle&gt;();</span>
+<span class="nc bnc" id="L550" title="All 2 branches missed.">		for(int i =0;i&lt;maximumNumberTowers;i++){</span>
+<span class="nc" id="L551">			int xCorner = currentMap.getWidthInPixel() +towerGraphicXStart + ((i)%2)*towerGraphicXOffset;</span>
+<span class="nc" id="L552">			int yCorner = towerGraphicYStart + (i/2)*towerGraphicYOffset;</span>
+<span class="nc" id="L553">			TowerGraphicButtonsList.add(new Rectangle(xCorner, yCorner, towerButtonWidth, towerButtonHeight));</span>
+
+		}
+		//sell and upgrade button
+<span class="nc" id="L557">		int i = 4;</span>
+<span class="nc" id="L558">		int xCorner = currentMap.getWidthInPixel() +towerGraphicXStart + ((i)%2)*towerGraphicXOffset;</span>
+<span class="nc" id="L559">		int yCorner = towerGraphicYStart + (i/2)*towerGraphicYOffset;</span>
+<span class="nc" id="L560">		SellButton = new Rectangle(xCorner,yCorner, towerButtonWidth, towerButtonHeight);</span>
+
+<span class="nc" id="L562">		i = 5;</span>
+<span class="nc" id="L563">		xCorner = currentMap.getWidthInPixel() +towerGraphicXStart + ((i)%2)*towerGraphicXOffset;</span>
+<span class="nc" id="L564">		yCorner = towerGraphicYStart + (i/2)*towerGraphicYOffset;</span>
+<span class="nc" id="L565">		UpgradeButton = new Rectangle(xCorner,yCorner, towerButtonWidth, towerButtonHeight);</span>
+<span class="nc" id="L566">	}</span>
+
+
+
+	public void createCritterQueueforLevel(){
+<span class="nc" id="L571">		int[][] locations = currentMap.getCornersList();</span>
+
+
+<span class="nc" id="L574">		generator = new CritterGenerator(locations,currentLevel);</span>
+<span class="nc" id="L575">		generator.createCritterQueue();</span>
+<span class="nc" id="L576">		generator.RandomizeCritterQueue();</span>
+<span class="nc" id="L577">		critterQueue = generator.getCritterQueue();</span>
+<span class="nc" id="L578">		activeCritterQueue = new LinkedList&lt;Critter&gt;();</span>
+<span class="nc" id="L579">		activeCritterQueue.add(critterQueue.poll());</span>
+<span class="nc" id="L580">	}</span>
+
+	public void addCrittersToActiveCritterQueue(){
+<span class="nc" id="L583">		tickCount++;</span>
+<span class="nc bnc" id="L584" title="All 2 branches missed.">		if(tickCount&gt;critterSpawnDelay){</span>
+<span class="nc" id="L585">			activeCritterQueue.add(critterQueue.poll());</span>
+<span class="nc" id="L586">			tickCount=0;	</span>
+		}
+<span class="nc" id="L588">	}</span>
+
+	public void updateCritters(){
+<span class="nc" id="L591">		boolean crittersAreStillVisible= false;</span>
+<span class="nc" id="L592">		ArrayList&lt;Critter&gt; crittersToRemove = new ArrayList&lt;Critter&gt;();</span>
+		//for each critter list, update their movement if they are alive
+<span class="nc bnc" id="L594" title="All 2 branches missed.">		for(Critter s : activeCritterQueue){</span>
+			//only living critters can move!
+<span class="nc bnc" id="L596" title="All 2 branches missed.">			if(s.isAlive())</span>
+<span class="nc" id="L597">				s.move();</span>
+			else{
+<span class="nc" id="L599">				Player.getPlayer().addCredits(s.getReward());</span>
+<span class="nc" id="L600">				crittersToRemove.add(s);</span>
+			}
+<span class="nc bnc" id="L602" title="All 2 branches missed.">			if(s.isVisible())</span>
+<span class="nc" id="L603">				crittersAreStillVisible=true;</span>
+<span class="nc bnc" id="L604" title="All 2 branches missed.">			if(s.isAtEndPoint()){</span>
+<span class="nc" id="L605">				Player.getPlayer().decreaseLife();</span>
+<span class="nc" id="L606">				crittersToRemove.add(s);</span>
+			}
+		}
+
+		//remove all the dead critters and the critters that have arrived at the exit
+<span class="nc bnc" id="L611" title="All 2 branches missed.">		for(Critter s : crittersToRemove){</span>
+<span class="nc" id="L612">			activeCritterQueue.remove(s);</span>
+		}
+
+
+<span class="nc bnc" id="L616" title="All 4 branches missed.">		if(!crittersAreStillVisible &amp;&amp; critterQueue.size()==0){</span>
+<span class="nc" id="L617">			waveIsInProgress = false;</span>
+<span class="nc" id="L618">			currentLevel++;</span>
+		}
+<span class="nc" id="L620">	}</span>
+
+	private void updateProjectiles(){
+		//for each projectile update their locations
+<span class="nc" id="L624">		pToRemove = new ArrayList&lt;Projectile&gt;();</span>
+<span class="nc bnc" id="L625" title="All 2 branches missed.">		for(Projectile p: projectileList){</span>
+<span class="nc bnc" id="L626" title="All 2 branches missed.">			if(!p.hasArrived())</span>
+<span class="nc" id="L627">				p.move();</span>
+			else
+<span class="nc" id="L629">				pToRemove.add(p);</span>
+		}
+
+<span class="nc bnc" id="L632" title="All 2 branches missed.">		for(Projectile p: pToRemove){</span>
+<span class="nc" id="L633">			projectileList.remove(p);</span>
+		}
+<span class="nc" id="L635">	}</span>
+
+	private void mouseClicked(int x, int y, StateBasedGame sbg, GameContainer container) throws SlickException {
+
+		//protection against multiple click registration
+<span class="nc bnc" id="L640" title="All 2 branches missed.">		if(lastClick + mouseClickDelay &gt; System.currentTimeMillis())</span>
+<span class="nc" id="L641">			return;</span>
+<span class="nc" id="L642">		lastClick = System.currentTimeMillis();</span>
+
+<span class="nc bnc" id="L644" title="All 2 branches missed.">		if(ExitButton.contains(x,y)){</span>
+<span class="nc" id="L645">			restartGame();</span>
+<span class="nc" id="L646">			AppGameContainer gameContainer = (AppGameContainer) container;</span>
+<span class="nc" id="L647">			gameContainer.setDisplayMode(640, 480, false);</span>
+<span class="nc" id="L648">			sbg.enterState(Game.menuScreen);</span>
+		}
+
+		//no towers selected
+<span class="nc bnc" id="L652" title="All 2 branches missed.">		if (selectedTower ==-1){</span>
+
+<span class="nc bnc" id="L654" title="All 4 branches missed.">			if(NextWaveButton.contains(x,y)&amp;&amp; !waveIsInProgress){</span>
+<span class="nc" id="L655">				waveIsInProgress = true;</span>
+<span class="nc" id="L656">				projectileList = new ArrayList&lt;Projectile&gt;();</span>
+<span class="nc" id="L657">				reloadTowers();</span>
+<span class="nc" id="L658">				createCritterQueueforLevel();</span>
+			}
+<span class="nc bnc" id="L660" title="All 2 branches missed.">			if(UpgradeButton.contains(x,y)){</span>
+<span class="nc" id="L661">				selectedTower = -2;</span>
+			}
+<span class="nc bnc" id="L663" title="All 2 branches missed.">			if(SellButton.contains(x,y)){</span>
+<span class="nc" id="L664">				selectedTower = -3;</span>
+			}
+
+<span class="nc bnc" id="L667" title="All 2 branches missed.">			for(int i=0;i&lt;maximumNumberTowers;i++){</span>
+<span class="nc bnc" id="L668" title="All 2 branches missed.">				if(TowerGraphicButtonsList.get(i).contains(x,y)){</span>
+<span class="nc" id="L669">					selectedTower = i;</span>
+
+				}
+			}
+<span class="nc" id="L673">			return;</span>
+		}
+		//tower selected
+<span class="nc bnc" id="L676" title="All 2 branches missed.">		else if (selectedTower &gt;=0){</span>
+<span class="nc bnc" id="L677" title="All 4 branches missed.">			if(mouseOnMap(x,y)&amp;&amp;canPlaceTowerHere(x,y)){</span>
+<span class="nc" id="L678">				Tower newTower = new BasicTower(getClosestTileCenter(x),getClosestTileCenter(y));</span>
+<span class="nc bnc" id="L679" title="All 4 branches missed.">				switch(selectedTower){</span>
+				case 0:
+					//do nothing
+<span class="nc" id="L682">					break;</span>
+				case 1:
+<span class="nc" id="L684">					newTower= new FreezeTower(getClosestTileCenter(x),getClosestTileCenter(y));</span>
+<span class="nc" id="L685">					break;</span>
+				case 2:
+<span class="nc" id="L687">					newTower= new SniperTower(getClosestTileCenter(x),getClosestTileCenter(y));</span>
+					break;
+
+				}
+
+<span class="nc" id="L692">				towerList.add(newTower);</span>
+<span class="nc" id="L693">				Player.getPlayer().addCredits((-1)*newTower.getBuyingCost());</span>
+
+<span class="nc bnc" id="L695" title="All 2 branches missed.">				if (Player.getPlayer().getCredits()&lt;0){</span>
+					//deny tower building due to insufficient funds or invalid tile
+<span class="nc" id="L697">					Player.getPlayer().addCredits(newTower.getBuyingCost());</span>
+<span class="nc" id="L698">					towerList.remove(newTower);</span>
+				}
+			}
+<span class="nc" id="L701">		}</span>
+<span class="nc bnc" id="L702" title="All 2 branches missed.">		else if(selectedTower == -2){</span>
+<span class="nc bnc" id="L703" title="All 2 branches missed.">			if(mouseOnMap(x,y)){</span>
+<span class="nc" id="L704">				Tower t = getNearestTower(x,y);</span>
+<span class="nc bnc" id="L705" title="All 2 branches missed.">				if(t!=null)</span>
+<span class="nc" id="L706">					t.upgrade();</span>
+			}
+<span class="nc" id="L708">		}</span>
+<span class="nc bnc" id="L709" title="All 2 branches missed.">		else if(selectedTower == -3){</span>
+<span class="nc bnc" id="L710" title="All 2 branches missed.">			if(mouseOnMap(x,y)){</span>
+<span class="nc" id="L711">				Tower t = getNearestTower(x,y);</span>
+<span class="nc bnc" id="L712" title="All 2 branches missed.">				if(t!=null){</span>
+<span class="nc" id="L713">					t.refundTower();			</span>
+<span class="nc" id="L714">					towerList.remove(t);</span>
+				}
+			}
+
+		}
+<span class="nc" id="L719">		selectedTower=-1;</span>
+<span class="nc" id="L720">	}</span>
+
+	public boolean mouseOnMap(int x, int y){
+<span class="nc bnc" id="L723" title="All 4 branches missed.">		if(x&lt;(currentMap.getWidthInPixel())&amp;&amp; y&lt; currentMap.getHeightInPixel()){</span>
+<span class="nc" id="L724">			return true;</span>
+		}
+		else
+<span class="nc" id="L727">			return false;</span>
+	}
+
+	public Tower getNearestTower(int x, int y){
+<span class="nc" id="L731">		double distanceApproximation=100;</span>
+<span class="nc" id="L732">		Tower nearestTower=null;</span>
+<span class="nc bnc" id="L733" title="All 2 branches missed.">		for(Tower t: towerList){</span>
+<span class="nc bnc" id="L734" title="All 2 branches missed.">			if(Math.abs(t.getXLoc()-x)+Math.abs(t.getYLoc()-y)&lt;distanceApproximation){</span>
+<span class="nc" id="L735">				nearestTower = t;</span>
+<span class="nc" id="L736">				distanceApproximation =Math.abs(t.getXLoc()-x)+Math.abs(t.getYLoc()-y);</span>
+			}
+
+		}
+<span class="nc" id="L740">		return nearestTower;</span>
+	}
+	public boolean canPlaceTowerHere(float x, float y){
+<span class="nc" id="L743">		int xArrayPos = (int)(getClosestTileCenter(x) - (currentMap.getPixelSize()/2))/currentMap.getPixelSize();</span>
+<span class="nc" id="L744">		int yArrayPos = (int)(getClosestTileCenter(y) - (currentMap.getPixelSize()/2))/currentMap.getPixelSize();</span>
+		//check is not a pathTile
+<span class="nc bnc" id="L746" title="All 2 branches missed.">		if (currentMap.getTile(xArrayPos, yArrayPos) instanceof PathTile){</span>
+<span class="nc" id="L747">			return false;</span>
+
+		}
+		//check there are no tower here
+<span class="nc bnc" id="L751" title="All 2 branches missed.">		for(Tower t: towerList){</span>
+<span class="nc bnc" id="L752" title="All 2 branches missed.">			if(getClosestTileCenter((float)t.getXLoc()) == getClosestTileCenter(x) &amp;&amp;</span>
+<span class="nc bnc" id="L753" title="All 2 branches missed.">					getClosestTileCenter((float)t.getYLoc()) == getClosestTileCenter(y)){</span>
+<span class="nc" id="L754">				return false;</span>
+			}
+		}
+<span class="nc" id="L757">		return true;</span>
+	}
+	public void restartGame() {
+<span class="nc" id="L760">		currentLevel = startingLevel;</span>
+<span class="nc" id="L761">		Player.getPlayer().reset();</span>
+
+<span class="nc" id="L763">		waveIsInProgress = false;</span>
+<span class="nc" id="L764">		critterQueue = new LinkedList&lt;Critter&gt;();</span>
+<span class="nc" id="L765">		activeCritterQueue = new LinkedList&lt;Critter&gt;();</span>
+<span class="nc" id="L766">		towerList =  new ArrayList&lt;Tower&gt;();</span>
+<span class="nc" id="L767">		gameOver=false;</span>
+		
+<span class="nc" id="L769">	}</span>
+
+	public void setMap(Map pMap){
+<span class="nc" id="L772">		currentMap = pMap;</span>
+<span class="nc" id="L773">	}</span>
+
+	public float getClosestTileCenter(float X){
+
+<span class="nc" id="L777">		return (float) (Math.floor(X / currentMap.getPixelSize()) * currentMap.getPixelSize() + currentMap.getPixelSize() / 2);</span>
+	}
+
+
+	@Override
+	public int getID() {
+<span class="nc" id="L783">		return Game.playScreen;</span>
+	}
+	
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 28, 2025 8:22:47 PM)</div></body></html>

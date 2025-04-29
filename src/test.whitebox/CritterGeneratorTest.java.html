@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>CritterGeneratorTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 28, 2025 8:22:47 PM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">test.whitebox</a> &gt; <span class="el_source">CritterGeneratorTest.java</span></div><h1>CritterGeneratorTest.java</h1><pre class="source lang-java linenums">package test.whitebox;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+
+import java.util.Queue;
+
+<span class="fc" id="L10">class CritterGeneratorTest {</span>
+
+    private critters.CritterGenerator generator;
+<span class="fc" id="L13">    private int[][] path = {</span>
+<span class="fc" id="L14">            {0, 0}, {10, 0}, {10, 10}</span>
+    };
+
+    @BeforeEach
+    void setUp() {
+<span class="fc" id="L19">        generator = new critters.CritterGenerator(path, 1); // level 1 =&gt; index 0</span>
+<span class="fc" id="L20">    }</span>
+
+    // ==== Unit Tests ====
+
+    @Test
+    void testAddCritterListSizeIs1000() {
+<span class="fc" id="L26">        int[][] result = generator.addCritterList(12);</span>
+<span class="fc" id="L27">        assertEquals(1000, result.length);</span>
+<span class="fc" id="L28">    }</span>
+
+    @Test
+    void testAddCritterListEachRowHasFiveElements() {
+<span class="fc" id="L32">        int[][] result = generator.addCritterList(12);</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        for (int[] row : result) {</span>
+<span class="fc" id="L34">            assertEquals(5, row.length);</span>
+        }
+<span class="fc" id="L36">    }</span>
+
+    @Test
+    void testGetCritterQueueReturnsNonNull() {
+<span class="fc" id="L40">        generator.createCritterQueue();</span>
+<span class="fc" id="L41">        assertNotNull(generator.getCritterQueue());</span>
+<span class="fc" id="L42">    }</span>
+
+    @Test
+    void testRandomizeCritterQueueDoesNotThrow() {
+<span class="fc" id="L46">        generator.createCritterQueue();</span>
+<span class="fc" id="L47">        assertDoesNotThrow(() -&gt; generator.RandomizeCritterQueue());</span>
+<span class="fc" id="L48">    }</span>
+
+    // ==== Integration Tests ====
+
+    @Test
+    void testCreateCritterQueueFillsCorrectNumber() {
+<span class="fc" id="L54">        generator.createCritterQueue();</span>
+        // CritterStream[0] = {2,1,0,0,0}
+<span class="fc" id="L56">        assertEquals(3, generator.getCritterQueue().size());</span>
+<span class="fc" id="L57">    }</span>
+
+    @Test
+    void testCreateCritterQueueFillsCorrectTypes() {
+<span class="fc" id="L61">        generator.createCritterQueue();</span>
+<span class="fc" id="L62">        long grunts = generator.getCritterQueue().stream().filter(c -&gt; c instanceof critters.GruntCritter).count();</span>
+<span class="fc" id="L63">        long scouts = generator.getCritterQueue().stream().filter(c -&gt; c instanceof critters.ScoutCritter).count();</span>
+<span class="fc" id="L64">        assertEquals(2, grunts);</span>
+<span class="fc" id="L65">        assertEquals(1, scouts);</span>
+<span class="fc" id="L66">    }</span>
+
+    @Test
+    void testQueueShuffleMaintainsSize() {
+<span class="fc" id="L70">        generator.createCritterQueue();</span>
+<span class="fc" id="L71">        int sizeBefore = generator.getCritterQueue().size();</span>
+<span class="fc" id="L72">        generator.RandomizeCritterQueue();</span>
+<span class="fc" id="L73">        int sizeAfter = generator.getCritterQueue().size();</span>
+<span class="fc" id="L74">        assertEquals(sizeBefore, sizeAfter);</span>
+<span class="fc" id="L75">    }</span>
+
+    @Test
+    void testQueuePrintDoesNotThrow() {
+<span class="fc" id="L79">        generator.createCritterQueue();</span>
+<span class="fc" id="L80">        assertDoesNotThrow(() -&gt; generator.printCritterQueue());</span>
+<span class="fc" id="L81">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 28, 2025 8:22:47 PM)</div></body></html>

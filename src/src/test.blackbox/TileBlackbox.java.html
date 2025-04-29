@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>TileBlackbox.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 25, 2025 2:18:13 AM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">test.blackbox</a> &gt; <span class="el_source">TileBlackbox.java</span></div><h1>TileBlackbox.java</h1><pre class="source lang-java linenums">package test.blackbox;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+
+import grid.MapTile;
+import grid.PathTile;
+import grid.Tile;
+
+<span class="fc" id="L11">class TileBlackbox {</span>
+
+    // Tile
+
+    @Test
+    public void testSetAndGetXEdgeCases() {
+<span class="fc" id="L17">        Tile tile = new PathTile(0, 0);</span>
+<span class="fc" id="L18">        tile.setX(Integer.MIN_VALUE);</span>
+<span class="fc" id="L19">        assertEquals(Integer.MIN_VALUE, tile.getX());</span>
+
+<span class="fc" id="L21">        tile.setX(Integer.MAX_VALUE);</span>
+<span class="fc" id="L22">        assertEquals(Integer.MAX_VALUE, tile.getX());</span>
+<span class="fc" id="L23">    }</span>
+
+    @Test
+    public void testSetAndGetYEdgeCases() {
+<span class="fc" id="L27">        Tile tile = new PathTile(0, 0);</span>
+<span class="fc" id="L28">        tile.setY(Integer.MIN_VALUE);</span>
+<span class="fc" id="L29">        assertEquals(Integer.MIN_VALUE, tile.getY());</span>
+
+<span class="fc" id="L31">        tile.setY(Integer.MAX_VALUE);</span>
+<span class="fc" id="L32">        assertEquals(Integer.MAX_VALUE, tile.getY());</span>
+<span class="fc" id="L33">    }</span>
+
+    @Test
+    public void testSetTypeNegative() {
+<span class="fc" id="L37">        Tile tile = new PathTile(0, 0);</span>
+<span class="fc" id="L38">        tile.setType(-1);</span>
+<span class="fc" id="L39">        assertEquals(-1, tile.getType(), &quot;Should accept negative types.&quot;);</span>
+<span class="fc" id="L40">    }</span>
+
+    @Test
+    public void testSetTypeExtreme() {
+<span class="fc" id="L44">        Tile tile = new PathTile(0, 0);</span>
+<span class="fc" id="L45">        tile.setType(Integer.MAX_VALUE);</span>
+<span class="fc" id="L46">        assertEquals(Integer.MAX_VALUE, tile.getType(), &quot;Should accept large positive types.&quot;);</span>
+<span class="fc" id="L47">    }</span>
+
+    @Test
+    public void testToStringReflectsTypeChange() {
+<span class="fc" id="L51">        Tile tile = new PathTile(0, 0);</span>
+<span class="fc" id="L52">        tile.setType(42);</span>
+<span class="fc" id="L53">        assertEquals(&quot;42&quot;, tile.toString());</span>
+<span class="fc" id="L54">    }</span>
+
+    // PathTile
+
+    @Test
+    public void testDefaultNextTileIsNull() {
+<span class="fc" id="L60">        PathTile tile = new PathTile(5, 5);</span>
+<span class="fc" id="L61">        assertNull(tile.getNextTile(), &quot;Next tile should initially be null.&quot;);</span>
+<span class="fc" id="L62">    }</span>
+
+    @Test
+    public void testSetNextTileToNull() {
+<span class="fc" id="L66">        PathTile tile = new PathTile(0, 0);</span>
+<span class="fc" id="L67">        tile.setNextTile(null);</span>
+<span class="fc" id="L68">        assertNull(tile.getNextTile(), &quot;Explicitly setting nextTile to null should be supported.&quot;);</span>
+<span class="fc" id="L69">    }</span>
+
+    @Test
+    public void testSelfReferentialNextTile() {
+<span class="fc" id="L73">        PathTile tile = new PathTile(1, 1);</span>
+<span class="fc" id="L74">        tile.setNextTile(tile);</span>
+<span class="fc" id="L75">        assertSame(tile, tile.getNextTile(), &quot;Tile should be able to reference itself.&quot;);</span>
+<span class="fc" id="L76">    }</span>
+
+    @Test
+    public void testPathTileWithNegativeCoordinates() {
+<span class="fc" id="L80">        PathTile tile = new PathTile(-10, -20);</span>
+<span class="fc" id="L81">        assertEquals(-10, tile.getX());</span>
+<span class="fc" id="L82">        assertEquals(-20, tile.getY());</span>
+<span class="fc" id="L83">    }</span>
+
+    // MapTile
+
+    @Test
+    public void testMapTileNegativeCoordinates() {
+<span class="fc" id="L89">        MapTile tile = new MapTile(-100, -200);</span>
+<span class="fc" id="L90">        assertEquals(-100, tile.getX());</span>
+<span class="fc" id="L91">        assertEquals(-200, tile.getY());</span>
+<span class="fc" id="L92">        assertEquals(0, tile.getType(), &quot;MapTile should default type to 0.&quot;);</span>
+<span class="fc" id="L93">    }</span>
+
+    @Test
+    public void testMapTileExtremeCoordinates() {
+<span class="fc" id="L97">        MapTile tile = new MapTile(Integer.MAX_VALUE, Integer.MIN_VALUE);</span>
+<span class="fc" id="L98">        assertEquals(Integer.MAX_VALUE, tile.getX());</span>
+<span class="fc" id="L99">        assertEquals(Integer.MIN_VALUE, tile.getY());</span>
+<span class="fc" id="L100">    }</span>
+
+    @Test
+    public void testMapTileToStringAfterChangingType() {
+<span class="fc" id="L104">        MapTile tile = new MapTile(0, 0);</span>
+<span class="fc" id="L105">        tile.setType(9);</span>
+<span class="fc" id="L106">        assertEquals(&quot;9&quot;, tile.toString(), &quot;toString should reflect updated type.&quot;);</span>
+<span class="fc" id="L107">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 25, 2025 2:18:13 AM)</div></body></html>

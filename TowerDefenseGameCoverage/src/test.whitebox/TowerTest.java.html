@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>TowerTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 28, 2025 8:22:47 PM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">test.whitebox</a> &gt; <span class="el_source">TowerTest.java</span></div><h1>TowerTest.java</h1><pre class="source lang-java linenums">package test.whitebox;
+
+import critters.Critter;
+import game.Player;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+<span class="fc" id="L10">public class TowerTest {</span>
+
+    private towers.Tower basicTower;
+    private towers.Tower freezeTower;
+    private towers.Tower sniperTower;
+
+    @BeforeEach
+    public void setup() {
+<span class="fc" id="L18">        Player player = new Player();</span>
+<span class="fc" id="L19">		player.reset(); // Ensure fresh credits</span>
+<span class="fc" id="L20">        Player.getPlayer().addCredits(1000);</span>
+
+<span class="fc" id="L22">        basicTower = new towers.BasicTower(0, 0);</span>
+<span class="fc" id="L23">        freezeTower = new towers.FreezeTower(1, 1);</span>
+<span class="fc" id="L24">        sniperTower = new towers.SniperTower(2, 2);</span>
+<span class="fc" id="L25">    }</span>
+
+    @Test
+    public void testInitialValuesBasicTower() {
+<span class="fc" id="L29">        assertEquals(100, basicTower.getBuyingCost());</span>
+<span class="fc" id="L30">        assertEquals(90, basicTower.getRefundValue());</span>
+<span class="fc" id="L31">        assertEquals(100, basicTower.getUpgradeCost());</span>
+<span class="fc" id="L32">        assertEquals(100, basicTower.getRange(), 0.01);</span>
+<span class="fc" id="L33">        assertEquals(0.6, basicTower.getPower(), 0.01);</span>
+<span class="fc" id="L34">        assertEquals(towers.Tower.type.GENERIC, basicTower.getType());</span>
+<span class="fc" id="L35">        assertFalse(basicTower.isFreezeTower());</span>
+<span class="fc" id="L36">    }</span>
+
+    @Test
+    public void testInitialValuesFreezeTower() {
+<span class="fc" id="L40">        assertEquals(200, freezeTower.getBuyingCost());</span>
+<span class="fc" id="L41">        assertEquals(180, freezeTower.getRefundValue());</span>
+<span class="fc" id="L42">        assertEquals(180, freezeTower.getUpgradeCost());</span>
+<span class="fc" id="L43">        assertEquals(80, freezeTower.getRange(), 0.01);</span>
+<span class="fc" id="L44">        assertEquals(0.0, freezeTower.getPower(), 0.01);</span>
+<span class="fc" id="L45">        assertTrue(freezeTower.isFreezeTower());</span>
+<span class="fc" id="L46">        assertEquals(towers.Tower.type.FREEZE, freezeTower.getType());</span>
+<span class="fc" id="L47">    }</span>
+
+    @Test
+    public void testInitialValuesSniperTower() {
+<span class="fc" id="L51">        assertEquals(300, sniperTower.getBuyingCost());</span>
+<span class="fc" id="L52">        assertEquals(250, sniperTower.getRefundValue());</span>
+<span class="fc" id="L53">        assertEquals(280, sniperTower.getUpgradeCost());</span>
+<span class="fc" id="L54">        assertEquals(300, sniperTower.getRange(), 0.01);</span>
+<span class="fc" id="L55">        assertEquals(20.0, sniperTower.getPower(), 0.01);</span>
+<span class="fc" id="L56">        assertEquals(towers.Tower.type.SNIPER, sniperTower.getType());</span>
+<span class="fc" id="L57">    }</span>
+
+    @Test
+    public void testCanAttackCooldown() {
+<span class="fc" id="L61">        basicTower.setTimeOfLastAttack(System.currentTimeMillis() - 1000);</span>
+<span class="fc" id="L62">        assertTrue(basicTower.canAttack());</span>
+
+<span class="fc" id="L64">        basicTower.setTimeOfLastAttack(System.currentTimeMillis());</span>
+<span class="fc" id="L65">        assertFalse(basicTower.canAttack());</span>
+<span class="fc" id="L66">    }</span>
+
+    @Test
+    public void testUpgradeSuccessAndFailure() {
+<span class="fc" id="L70">        int initialCredits = Player.getPlayer().getCredits();</span>
+<span class="fc" id="L71">        assertTrue(basicTower.upgrade());</span>
+<span class="fc" id="L72">        assertEquals(2, basicTower.getLevel());</span>
+<span class="fc" id="L73">        assertEquals(initialCredits - basicTower.getUpgradeCost(), Player.getPlayer().getCredits());</span>
+
+<span class="fc" id="L75">        Player.getPlayer().addCredits(-100000); // not enough for upgrade</span>
+<span class="fc" id="L76">        assertFalse(basicTower.upgrade());</span>
+<span class="fc" id="L77">        assertEquals(2, basicTower.getLevel());</span>
+<span class="fc" id="L78">    }</span>
+
+    @Test
+    public void testMaxLevelLimit() {
+<span class="fc" id="L82">        basicTower.upgrade();</span>
+<span class="fc" id="L83">        basicTower.upgrade();</span>
+<span class="fc" id="L84">        assertFalse(basicTower.upgrade()); // level 3 max</span>
+<span class="fc" id="L85">        assertEquals(3, basicTower.getLevel());</span>
+<span class="fc" id="L86">    }</span>
+
+    @Test
+    public void testRefundTower() {
+<span class="fc" id="L90">        int creditsBefore = Player.getPlayer().getCredits();</span>
+<span class="fc" id="L91">        basicTower.refundTower();</span>
+<span class="fc" id="L92">        assertEquals(creditsBefore + 90, Player.getPlayer().getCredits());</span>
+<span class="fc" id="L93">    }</span>
+
+    @Test
+    public void testSettersAndGetters() {
+<span class="fc" id="L97">        basicTower.setBuyingCost(500);</span>
+<span class="fc" id="L98">        assertEquals(500, basicTower.getBuyingCost());</span>
+
+<span class="fc" id="L100">        basicTower.setRefundValue(250);</span>
+<span class="fc" id="L101">        assertEquals(250, basicTower.getRefundValue());</span>
+
+<span class="fc" id="L103">        basicTower.setRange(50);</span>
+<span class="fc" id="L104">        assertEquals(50 * basicTower.getModifier(), basicTower.getRange(), 0.01);</span>
+
+<span class="fc" id="L106">        basicTower.setPower(2);</span>
+<span class="fc" id="L107">        assertEquals(2 * basicTower.getModifier(), basicTower.getPower(), 0.01);</span>
+
+<span class="fc" id="L109">        basicTower.setUpgradeCost(300);</span>
+<span class="fc" id="L110">        assertEquals(300, basicTower.getUpgradeCost());</span>
+
+<span class="fc" id="L112">        assertEquals(0, basicTower.getCritterTravelDistanceMaximum());</span>
+<span class="fc" id="L113">        basicTower.setCritterTravelDistanceMaximum(123.4);</span>
+<span class="fc" id="L114">        assertEquals(123.4, basicTower.getCritterTravelDistanceMaximum());</span>
+<span class="fc" id="L115">    }</span>
+
+    @Test
+    public void testRotationAngleWithNullCritter() {
+<span class="fc" id="L119">        assertEquals(0.0, basicTower.getRotationAngleInDegrees(), 0.01);</span>
+<span class="fc" id="L120">    }</span>
+    
+    @Test
+    public void testTowerUpgradeAffectsPlayerCredits() {
+<span class="fc" id="L124">        Player.getPlayer().reset();</span>
+<span class="fc" id="L125">        Player.getPlayer().addCredits(1000);</span>
+
+<span class="fc" id="L127">        int creditsBefore = Player.getPlayer().getCredits();</span>
+<span class="fc" id="L128">        boolean upgraded = basicTower.upgrade();</span>
+<span class="fc" id="L129">        int creditsAfter = Player.getPlayer().getCredits();</span>
+
+<span class="fc" id="L131">        assertTrue(upgraded, &quot;Upgrade should succeed&quot;);</span>
+<span class="fc" id="L132">        assertEquals(creditsBefore - 100, creditsAfter, &quot;Credits should be deducted by upgrade cost&quot;);</span>
+<span class="fc" id="L133">    }</span>
+
+    @Test
+    public void testRefundIncreasesPlayerCredits() {
+<span class="fc" id="L137">        Player.getPlayer().reset();</span>
+<span class="fc" id="L138">        Player.getPlayer().addCredits(500);</span>
+
+<span class="fc" id="L140">        int beforeRefund = Player.getPlayer().getCredits();</span>
+<span class="fc" id="L141">        basicTower.refundTower();</span>
+<span class="fc" id="L142">        int afterRefund = Player.getPlayer().getCredits();</span>
+
+<span class="fc" id="L144">        assertEquals(beforeRefund + 90, afterRefund, &quot;Refund should increase player's credits correctly&quot;);</span>
+<span class="fc" id="L145">    }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 28, 2025 8:22:47 PM)</div></body></html>

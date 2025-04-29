@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>Projectile.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 28, 2025 8:22:47 PM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">towers</a> &gt; <span class="el_source">Projectile.java</span></div><h1>Projectile.java</h1><pre class="source lang-java linenums">package towers;
+
+import critters.Critter;
+
+public class Projectile {
+<span class="fc" id="L6">	public enum projectileType{</span>
+<span class="fc" id="L7">		GENERIC,FREEZE,SNIPER</span>
+	}
+	private double xLoc;
+	private double yLoc;
+	private double xDest;
+	private double yDest;
+	private double xInit;
+	private double yInit;
+	private double power;
+<span class="fc" id="L16">	private double speed = 20;</span>
+	private projectileType projType;
+<span class="fc" id="L18">	private boolean arrivedAtTarget = false;</span>
+	private Critter targetCritter;
+	private int towerSourceLevel;
+	
+<span class="fc" id="L22">	public Projectile(double pXInit, double pYInit, double pXDest, double pYDest, double pPower, Critter pTargetCritter, projectileType pType, int level){</span>
+		
+
+<span class="fc" id="L25">		xInit = pXInit;		</span>
+<span class="fc" id="L26">		xDest = pXDest;</span>
+<span class="fc" id="L27">		yInit= pYInit;	</span>
+<span class="fc" id="L28">		yDest = pYDest;</span>
+<span class="fc" id="L29">		power = pPower;</span>
+		
+<span class="fc" id="L31">		xLoc = xInit +12*Math.cos(angleOfProjectileInRadians());</span>
+<span class="fc" id="L32">		yLoc = yInit +12*Math.sin(angleOfProjectileInRadians());</span>
+<span class="fc" id="L33">		arrivedAtTarget = false;</span>
+		
+<span class="fc" id="L35">		towerSourceLevel = level;</span>
+		
+<span class="fc" id="L37">		targetCritter = pTargetCritter;</span>
+<span class="fc" id="L38">		projType = pType;</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">		if(projType == projectileType.SNIPER){</span>
+<span class="fc" id="L40">			speed=30;</span>
+		}
+<span class="fc" id="L42">	}</span>
+	
+	public double angleOfProjectileInDegrees(){
+<span class="fc" id="L45">		return (180/Math.PI)*Math.atan2(yDest-yInit, xDest-xInit);</span>
+	}
+
+	public double angleOfProjectileInRadians(){
+<span class="fc" id="L49">		return Math.atan2(yDest-yInit, xDest-xInit);</span>
+	}
+
+	public void move(){
+		
+		//projectile has hit
+<span class="pc bpc" id="L55" title="1 of 4 branches missed.">		if (Math.abs(xLoc - xDest)&lt; speed/2 || Math.abs(yLoc - yDest)&lt; speed/2){</span>
+<span class="fc" id="L56">			arrivedAtTarget = true;</span>
+<span class="fc" id="L57">			targetCritter.takeDamage(power);</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">			if(projType == projectileType.FREEZE){</span>
+<span class="fc" id="L59">				targetCritter.setFreezeDuration(4000 +(towerSourceLevel-1)*1000);</span>
+<span class="fc" id="L60">				targetCritter.freezeCritter();</span>
+				
+			}
+<span class="fc" id="L63">		}</span>
+		else{
+<span class="nc" id="L65">			xLoc += speed*Math.cos(angleOfProjectileInRadians());</span>
+
+<span class="nc" id="L67">			yLoc += speed*Math.sin(angleOfProjectileInRadians());</span>
+		}
+<span class="fc" id="L69">	}</span>
+	
+	public boolean hasArrived(){
+<span class="fc" id="L72">		return arrivedAtTarget;</span>
+	}
+	
+	public double getX(){
+<span class="fc" id="L76">		return this.xLoc;</span>
+	}
+	public double getY(){
+<span class="fc" id="L79">		return this.yLoc;</span>
+	}
+	
+	public double getSpeed(){
+<span class="fc" id="L83">		return this.speed;</span>
+	}
+	
+	public projectileType getType(){
+<span class="fc" id="L87">		return this.projType;</span>
+	}
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 28, 2025 8:22:47 PM)</div></body></html>

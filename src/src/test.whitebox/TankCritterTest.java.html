@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>TankCritterTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 25, 2025 2:18:13 AM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">test.whitebox</a> &gt; <span class="el_source">TankCritterTest.java</span></div><h1>TankCritterTest.java</h1><pre class="source lang-java linenums">package test.whitebox;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+<span class="fc" id="L8">public class TankCritterTest {</span>
+
+    private critters.TankCritter tank;
+<span class="fc" id="L11">    private int[][] path = {</span>
+<span class="fc" id="L12">        {0, 0}, {10, 0}, {10, 10}</span>
+    };
+
+    @BeforeEach
+    void setUp() {
+<span class="fc" id="L17">        tank = new critters.TankCritter(path);</span>
+<span class="fc" id="L18">    }</span>
+
+    // === Constructor &amp; Attributes ===
+
+    @Test
+    void testNameIsTank() {
+<span class="fc" id="L24">        assertEquals(&quot;Tank&quot;, tank.getName());</span>
+<span class="fc" id="L25">    }</span>
+
+    @Test
+    void testHealthIs15() {
+<span class="fc" id="L29">        assertEquals(15.0, tank.getHealth());</span>
+<span class="fc" id="L30">    }</span>
+
+    @Test
+    void testSpeedIs0Point6() {
+<span class="fc" id="L34">        assertEquals(0.6, tank.getSpeed());</span>
+<span class="fc" id="L35">    }</span>
+
+    @Test
+    void testRewardIs80() {
+<span class="fc" id="L39">        assertEquals(80, tank.getReward());</span>
+<span class="fc" id="L40">    }</span>
+
+    @Test
+    void testTypeIsTank() {
+<span class="fc" id="L44">        assertEquals(critters.Critter.type.TANK, tank.getType());</span>
+<span class="fc" id="L45">    }</span>
+
+    // === Movement ===
+
+    @Test
+    void testMoveIncreasesXLoc() {
+<span class="fc" id="L51">        float initialX = tank.getXLoc();</span>
+<span class="fc" id="L52">        tank.move();</span>
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">        assertTrue(tank.getXLoc() &gt; initialX);</span>
+<span class="fc" id="L54">    }</span>
+
+    @Test
+    void testDirectionIsRightAfterMove() {
+<span class="fc" id="L58">        tank.move();</span>
+<span class="fc" id="L59">        assertEquals(critters.Critter.direction.RIGHT, tank.getCritterDirection());</span>
+<span class="fc" id="L60">    }</span>
+
+    @Test
+    void testMoveUntilEndPointReached() {
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        while (!tank.isAtEndPoint()) {</span>
+<span class="fc" id="L65">            tank.move();</span>
+        }
+<span class="fc" id="L67">        assertTrue(tank.isAtEndPoint());</span>
+<span class="fc" id="L68">    }</span>
+
+    @Test
+    void testMoveUntilEndPointSetsInvisible() {
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        while (!tank.isAtEndPoint()) {</span>
+<span class="fc" id="L73">            tank.move();</span>
+        }
+<span class="fc" id="L75">        assertFalse(tank.isVisible());</span>
+<span class="fc" id="L76">    }</span>
+
+    // === Damage Logic ===
+
+    @Test
+    void testTakeNonLethalDamageReducesHealth() {
+<span class="fc" id="L82">        tank.takeDamage(4); // 4 / 4 = 1</span>
+<span class="fc" id="L83">        assertEquals(14.0, tank.getHealth(), 0.01);</span>
+<span class="fc" id="L84">    }</span>
+
+    @Test
+    void testTakeLethalDamageKillsTank() {
+<span class="fc" id="L88">        tank.takeDamage(100); // 100 / 4 = 25 &gt; 15</span>
+<span class="fc" id="L89">        assertFalse(tank.isAlive());</span>
+<span class="fc" id="L90">    }</span>
+
+    @Test
+    void testTakeLethalDamageMakesTankInvisible() {
+<span class="fc" id="L94">        tank.takeDamage(100);</span>
+<span class="fc" id="L95">        assertFalse(tank.isVisible());</span>
+<span class="fc" id="L96">    }</span>
+
+    @Test
+    void testTakeZeroDamageKeepsHealthUnchanged() {
+<span class="fc" id="L100">        double hp = tank.getHealth();</span>
+<span class="fc" id="L101">        tank.takeDamage(0);</span>
+<span class="fc" id="L102">        assertEquals(hp, tank.getHealth());</span>
+<span class="fc" id="L103">    }</span>
+
+    // === Freeze Logic ===
+
+    @Test
+    void testFreezeReducesSpeed() {
+<span class="fc" id="L109">        double normal = tank.getSpeed();</span>
+<span class="fc" id="L110">        tank.freezeCritter();</span>
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">        assertTrue(tank.getSpeed() &lt; normal);</span>
+<span class="fc" id="L112">    }</span>
+
+    @Test
+    void testUnfreezeRestoresSpeed() throws InterruptedException {
+<span class="fc" id="L116">        double normal = 0.6;</span>
+<span class="fc" id="L117">        tank.freezeCritter();</span>
+<span class="fc" id="L118">        Thread.sleep(4100); // default freezeDuration is 4000</span>
+<span class="fc" id="L119">        tank.move();</span>
+<span class="fc" id="L120">        assertEquals(normal, tank.getSpeed(), 0.01);</span>
+<span class="fc" id="L121">    }</span>
+
+    @Test
+    void testSetFreezeDurationShortAndUnfreeze() throws InterruptedException {
+<span class="fc" id="L125">        tank.setFreezeDuration(100);</span>
+<span class="fc" id="L126">        tank.freezeCritter();</span>
+<span class="fc" id="L127">        Thread.sleep(150);</span>
+<span class="fc" id="L128">        tank.move();</span>
+<span class="fc" id="L129">        assertEquals(0.6, tank.getSpeed(), 0.01);</span>
+<span class="fc" id="L130">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 25, 2025 2:18:13 AM)</div></body></html>

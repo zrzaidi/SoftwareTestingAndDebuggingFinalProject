@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>MapTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 25, 2025 2:18:13 AM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">test.whitebox</a> &gt; <span class="el_source">MapTest.java</span></div><h1>MapTest.java</h1><pre class="source lang-java linenums">package test.whitebox;
+
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import grid.PathTile;
+import grid.Tile;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+
+<span class="fc" id="L13">class MapTest {</span>
+    private map.Map map;
+    
+    @BeforeEach
+    void setUp() {
+<span class="fc" id="L18">        map = new map.Map();</span>
+<span class="fc" id="L19">    }</span>
+    
+    @Test
+    void testConstructor() {
+<span class="fc" id="L23">        assertEquals(0, map.getWidthOfMap());</span>
+<span class="fc" id="L24">        assertEquals(0, map.getHeightOfMap());</span>
+<span class="fc" id="L25">        assertEquals(&quot;&quot;, map.getInputCorner());</span>
+<span class="fc" id="L26">        assertTrue(map.ValidityOfMap());</span>
+<span class="fc" id="L27">    }</span>
+    
+    @Test
+    void testSetMapSize() {
+<span class="fc" id="L31">        map.setMapSize(10, 15);</span>
+<span class="fc" id="L32">        assertEquals(10, map.getWidthOfMap());</span>
+<span class="fc" id="L33">        assertEquals(15, map.getHeightOfMap());</span>
+<span class="fc" id="L34">        assertEquals(10 * 32, map.getWidthInPixel());</span>
+<span class="fc" id="L35">        assertEquals(15 * 32, map.getHeightInPixel());</span>
+<span class="fc" id="L36">    }</span>
+    
+    @Test
+    void testSetInputCorner() {
+<span class="fc" id="L40">        map.setInputCorner(&quot;(0,0) (5,5)&quot;);</span>
+<span class="fc" id="L41">        assertEquals(&quot;(0,0) (5,5)&quot;, map.getInputCorner());</span>
+<span class="fc" id="L42">    }</span>
+    
+    @Test
+    void testInitializeMap() {
+<span class="fc" id="L46">        map.setMapSize(5, 5);</span>
+<span class="fc" id="L47">        map.initializeMap();</span>
+        
+        // Check if all tiles are initialized as MapTile
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        for (int i = 0; i &lt; 5; i++) {</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">            for (int j = 0; j &lt; 5; j++) {</span>
+<span class="fc" id="L52">                Tile tile = map.getTile(i, j);</span>
+<span class="fc" id="L53">                assertNotNull(tile);</span>
+<span class="fc" id="L54">                assertEquals(i, tile.getX());</span>
+<span class="fc" id="L55">                assertEquals(j, tile.getY());</span>
+            }
+        }
+        
+        // Test with invalid dimensions
+<span class="fc" id="L60">        map.Map invalidMap = new map.Map();</span>
+<span class="fc" id="L61">        invalidMap.setMapSize(0, 0);</span>
+<span class="fc" id="L62">        invalidMap.initializeMap();</span>
+<span class="fc" id="L63">        assertNull(invalidMap.getTile(0, 0));</span>
+<span class="fc" id="L64">    }</span>
+    
+    @Test
+    void testGetTile() {
+<span class="fc" id="L68">        map.setMapSize(5, 5);</span>
+<span class="fc" id="L69">        map.initializeMap();</span>
+        
+        // Valid coordinates
+<span class="fc" id="L72">        assertNotNull(map.getTile(2, 3));</span>
+        
+        // Invalid coordinates should return null
+<span class="fc" id="L75">        assertNull(map.getTile(10, 10));</span>
+<span class="fc" id="L76">    }</span>
+    
+    @Test
+    void testGetPixelSize() {
+<span class="fc" id="L80">        assertEquals(32, map.getPixelSize());</span>
+<span class="fc" id="L81">    }</span>
+    
+    @Test
+    void testPlaceEntryAndGetEntry() {
+<span class="fc" id="L85">        map.setMapSize(5, 5);</span>
+<span class="fc" id="L86">        map.initializeMap();</span>
+<span class="fc" id="L87">        map.placeEntry(0, 0);</span>
+        
+<span class="fc" id="L89">        Tile entryTile = map.getTile(0, 0);</span>
+<span class="fc" id="L90">        assertEquals(2, entryTile.getType());</span>
+<span class="fc" id="L91">        assertTrue(entryTile instanceof PathTile);</span>
+        
+<span class="fc" id="L93">        PathTile entry = map.getEntry();</span>
+<span class="fc" id="L94">        assertEquals(0, entry.getX());</span>
+<span class="fc" id="L95">        assertEquals(0, entry.getY());</span>
+<span class="fc" id="L96">    }</span>
+    
+    @Test
+    void testPlaceExit() {
+<span class="fc" id="L100">        map.setMapSize(5, 5);</span>
+<span class="fc" id="L101">        map.initializeMap();</span>
+<span class="fc" id="L102">        map.placeExit(4, 4);</span>
+        
+<span class="fc" id="L104">        Tile exitTile = map.getTile(4, 4);</span>
+<span class="fc" id="L105">        assertEquals(3, exitTile.getType());</span>
+<span class="fc" id="L106">        assertTrue(exitTile instanceof PathTile);</span>
+<span class="fc" id="L107">    }</span>
+    
+    @Test
+    void testPlacePathPoint() {
+<span class="fc" id="L111">        map.setMapSize(5, 5);</span>
+<span class="fc" id="L112">        map.initializeMap();</span>
+<span class="fc" id="L113">        map.placePathPoint(2, 2);</span>
+        
+<span class="fc" id="L115">        assertTrue(map.getTile(2, 2) instanceof PathTile);</span>
+        
+        // Test placing path on an already path tile
+<span class="fc" id="L118">        map.placePathPoint(2, 2);</span>
+<span class="fc" id="L119">        assertTrue(map.getTile(2, 2) instanceof PathTile);</span>
+<span class="fc" id="L120">    }</span>
+    
+    @Test
+    void testArrangePathPoint() {
+<span class="fc" id="L124">        ArrayList&lt;Integer&gt; pathPoints = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L125">        pathPoints.add(0);</span>
+<span class="fc" id="L126">        pathPoints.add(0);</span>
+<span class="fc" id="L127">        pathPoints.add(5);</span>
+<span class="fc" id="L128">        pathPoints.add(5);</span>
+        
+<span class="fc" id="L130">        String result = map.arrangePathPoint(pathPoints);</span>
+<span class="fc" id="L131">        assertEquals(&quot;(0,0) (5,5) &quot;, result);</span>
+<span class="fc" id="L132">        assertEquals(result, map.getInputCorner());</span>
+<span class="fc" id="L133">    }</span>
+    
+    @Test
+    void testMultipleCoordinatesSplit() {
+        // Test with valid input
+<span class="fc" id="L138">        Queue&lt;PathTile&gt; path = map.multipleCoordinatesSplit(&quot;(0,0) (5,5)&quot;);</span>
+<span class="fc" id="L139">        assertNotNull(path);</span>
+<span class="fc" id="L140">        assertEquals(2, path.size());</span>
+        
+<span class="fc" id="L142">        PathTile first = path.poll();</span>
+<span class="fc" id="L143">        assertEquals(0, first.getX());</span>
+<span class="fc" id="L144">        assertEquals(0, first.getY());</span>
+        
+<span class="fc" id="L146">        PathTile second = path.poll();</span>
+<span class="fc" id="L147">        assertEquals(5, second.getX());</span>
+<span class="fc" id="L148">        assertEquals(5, second.getY());</span>
+        
+        // Test with empty input
+<span class="fc" id="L151">        path = map.multipleCoordinatesSplit(&quot;&quot;);</span>
+<span class="fc" id="L152">        assertNull(path);</span>
+<span class="fc" id="L153">    }</span>
+    
+    @Test
+    void testCornerArray() {
+<span class="fc" id="L157">        map.setMapSize(10, 10);</span>
+        
+<span class="fc" id="L159">        Queue&lt;PathTile&gt; path = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L160">        path.add(new PathTile(0, 0));  // Entry at left edge</span>
+<span class="fc" id="L161">        path.add(new PathTile(5, 0));</span>
+<span class="fc" id="L162">        path.add(new PathTile(9, 9));  // Exit</span>
+        
+<span class="fc" id="L164">        int[][] cornerArray = map.cornerArray(path);</span>
+        
+        // First point (entry) - edge case
+<span class="fc" id="L167">        assertEquals(0, cornerArray[0][0]); // x=0 is on left edge</span>
+<span class="fc" id="L168">        assertEquals(16, cornerArray[0][1]); // y centered</span>
+        
+        // Middle point
+<span class="fc" id="L171">        assertEquals(5 * 32 + 16, cornerArray[1][0]);</span>
+<span class="fc" id="L172">        assertEquals(0 * 32 + 16, cornerArray[1][1]);</span>
+        
+        // Last point
+<span class="fc" id="L175">        assertEquals(9 * 32 + 16, cornerArray[2][0]);</span>
+<span class="fc" id="L176">        assertEquals(9 * 32 + 16, cornerArray[2][1]);</span>
+        
+        // Test getting the corner list
+<span class="fc" id="L179">        int[][] retrievedCorners = map.getCornersList();</span>
+<span class="fc" id="L180">        assertArrayEquals(cornerArray, retrievedCorners);</span>
+<span class="fc" id="L181">    }</span>
+    
+    @Test
+    void testBuildPathEmptyOrNull() {
+<span class="fc" id="L185">        map.setMapSize(5, 5);</span>
+<span class="fc" id="L186">        map.initializeMap();</span>
+        
+        // Test with null path
+<span class="fc" id="L189">        map.buildPath(null);</span>
+        
+        // Test with empty path
+<span class="fc" id="L192">        Queue&lt;PathTile&gt; emptyPath = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L193">        map.buildPath(emptyPath);</span>
+<span class="fc" id="L194">    }</span>
+    
+    @Test
+    void testBuildPathValid() {
+<span class="fc" id="L198">        map.setMapSize(10, 10);</span>
+<span class="fc" id="L199">        map.initializeMap();</span>
+        
+<span class="fc" id="L201">        Queue&lt;PathTile&gt; path = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L202">        path.add(new PathTile(0, 0));  // Entry</span>
+<span class="fc" id="L203">        path.add(new PathTile(0, 5));  // Path point</span>
+<span class="fc" id="L204">        path.add(new PathTile(9, 5));  // Path point</span>
+<span class="fc" id="L205">        path.add(new PathTile(9, 9));  // Exit</span>
+        
+<span class="fc" id="L207">        map.buildPath(path);</span>
+        
+        // Check entry point
+<span class="fc" id="L210">        assertEquals(2, map.getTile(0, 0).getType());</span>
+        
+        // Check path points
+<span class="fc" id="L213">        assertTrue(map.getTile(0, 1) instanceof PathTile);</span>
+<span class="fc" id="L214">        assertTrue(map.getTile(0, 5) instanceof PathTile);</span>
+<span class="fc" id="L215">        assertTrue(map.getTile(5, 5) instanceof PathTile);</span>
+        
+        // Check exit point
+<span class="fc" id="L218">        assertEquals(3, map.getTile(9, 9).getType());</span>
+<span class="fc" id="L219">    }</span>
+    
+    @Test
+    void testLinkTwoPoints() {
+<span class="fc" id="L223">        map.setMapSize(10, 10);</span>
+<span class="fc" id="L224">        map.initializeMap();</span>
+        
+        // Test horizontal connection (same y)
+<span class="fc" id="L227">        PathTile start = new PathTile(1, 1);</span>
+<span class="fc" id="L228">        PathTile end = new PathTile(5, 1);</span>
+<span class="fc" id="L229">        map.placePathPoint(start.getX(), start.getY());</span>
+<span class="fc" id="L230">        map.linkTwoPoints(start, end);</span>
+        
+<span class="fc bfc" id="L232" title="All 2 branches covered.">        for (int i = start.getX(); i &lt;= end.getX(); i++) {</span>
+<span class="fc" id="L233">            assertTrue(map.getTile(i, 1) instanceof PathTile);</span>
+        }
+        
+        // Test vertical connection (same x)
+<span class="fc" id="L237">        start = new PathTile(7, 2);</span>
+<span class="fc" id="L238">        end = new PathTile(7, 6);</span>
+<span class="fc" id="L239">        map.placePathPoint(start.getX(), start.getY());</span>
+<span class="fc" id="L240">        map.linkTwoPoints(start, end);</span>
+        
+<span class="fc bfc" id="L242" title="All 2 branches covered.">        for (int j = start.getY(); j &lt;= end.getY(); j++) {</span>
+<span class="fc" id="L243">            assertTrue(map.getTile(7, j) instanceof PathTile);</span>
+        }
+        
+        // Test reverse directions
+        // Horizontal right to left
+<span class="fc" id="L248">        start = new PathTile(5, 8);</span>
+<span class="fc" id="L249">        end = new PathTile(2, 8);</span>
+<span class="fc" id="L250">        map.placePathPoint(start.getX(), start.getY());</span>
+<span class="fc" id="L251">        map.linkTwoPoints(start, end);</span>
+        
+<span class="fc bfc" id="L253" title="All 2 branches covered.">        for (int i = end.getX(); i &lt;= start.getX(); i++) {</span>
+<span class="fc" id="L254">            assertTrue(map.getTile(i, 8) instanceof PathTile);</span>
+        }
+        
+        // Vertical bottom to top
+<span class="fc" id="L258">        start = new PathTile(9, 8);</span>
+<span class="fc" id="L259">        end = new PathTile(9, 3);</span>
+<span class="fc" id="L260">        map.placePathPoint(start.getX(), start.getY());</span>
+<span class="fc" id="L261">        map.linkTwoPoints(start, end);</span>
+        
+<span class="fc bfc" id="L263" title="All 2 branches covered.">        for (int j = end.getY(); j &lt;= start.getY(); j++) {</span>
+<span class="fc" id="L264">            assertTrue(map.getTile(9, j) instanceof PathTile);</span>
+        }
+        
+        // Test diagonal connection (should place only the endpoints)
+<span class="fc" id="L268">        start = new PathTile(1, 1);</span>
+<span class="fc" id="L269">        end = new PathTile(3, 3);</span>
+<span class="fc" id="L270">        map.linkTwoPoints(start, end);</span>
+        
+<span class="fc" id="L272">        assertTrue(map.getTile(1, 1) instanceof PathTile);</span>
+<span class="fc" id="L273">        assertTrue(map.getTile(3, 3) instanceof PathTile);</span>
+<span class="fc" id="L274">    }</span>
+    
+    @Test
+    void testConvertToBinaryMap() {
+<span class="fc" id="L278">        map.setMapSize(5, 5);</span>
+<span class="fc" id="L279">        map.initializeMap();</span>
+        
+        // Create a simple path
+<span class="fc" id="L282">        Queue&lt;PathTile&gt; path = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L283">        path.add(new PathTile(0, 0));  // Entry</span>
+<span class="fc" id="L284">        path.add(new PathTile(0, 4));  // Path point</span>
+<span class="fc" id="L285">        path.add(new PathTile(4, 4));  // Exit</span>
+        
+<span class="fc" id="L287">        map.buildPath(path);</span>
+        
+<span class="fc" id="L289">        int[][] binaryMap = map.convertToBinaryMap(map);</span>
+        
+        // Check entry point (type 2)
+<span class="fc" id="L292">        assertEquals(2, binaryMap[0][0]);</span>
+        
+        // Check path points (type 1)
+<span class="fc bfc" id="L295" title="All 2 branches covered.">        for (int i = 1; i &lt; 4; i++) {</span>
+<span class="fc" id="L296">            assertEquals(1, binaryMap[i][0]);</span>
+        }
+        
+        // Check exit point (type 3)
+<span class="fc" id="L300">        assertEquals(3, binaryMap[4][4]);</span>
+        
+        // Check non-path points (type 0)
+<span class="fc" id="L303">        assertEquals(0, binaryMap[2][2]);</span>
+<span class="fc" id="L304">    }</span>
+    
+    @Test
+    void testConvertFromBinaryMap() {
+<span class="fc" id="L308">        int[][] binaryMap = {</span>
+<span class="fc" id="L309">            {2, 0, 0, 0, 0},</span>
+<span class="fc" id="L310">            {1, 0, 0, 0, 0},</span>
+<span class="fc" id="L311">            {1, 1, 1, 0, 0},</span>
+<span class="fc" id="L312">            {0, 0, 1, 0, 0},</span>
+<span class="fc" id="L313">            {0, 0, 1, 1, 3}</span>
+        };
+        
+<span class="fc" id="L316">        map.Map newMap = map.convertFromBinaryMap(binaryMap);</span>
+        
+        // Check dimensions
+<span class="fc" id="L319">        assertEquals(5, newMap.getWidthOfMap());</span>
+<span class="fc" id="L320">        assertEquals(5, newMap.getHeightOfMap());</span>
+        
+        // Check entry point (type 2)
+<span class="fc" id="L323">        assertEquals(2, newMap.getTile(0, 0).getType());</span>
+        
+        // Check path points (type 1)
+<span class="fc" id="L326">        assertEquals(1, newMap.getTile(0, 1).getType());</span>
+<span class="fc" id="L327">        assertEquals(1, newMap.getTile(1, 2).getType());</span>
+        
+        // Check exit point (type 3)
+<span class="fc" id="L330">        assertEquals(3, newMap.getTile(4, 4).getType());</span>
+        
+        // Check non-path points (type 0)
+<span class="fc" id="L333">        assertEquals(0, newMap.getTile(2, 0).getType());</span>
+<span class="fc" id="L334">    }</span>
+    
+    @Test
+    void testValidityOfMap() {
+<span class="fc" id="L338">        map.setMapSize(5, 5);</span>
+<span class="fc" id="L339">        map.initializeMap();</span>
+        
+        // By default, the map should be valid
+<span class="fc" id="L342">        assertTrue(map.ValidityOfMap());</span>
+<span class="fc" id="L343">    }</span>
+    
+    @Test
+    void testToString() {
+<span class="fc" id="L347">        map.setMapSize(3, 2);</span>
+<span class="fc" id="L348">        map.initializeMap();</span>
+<span class="fc" id="L349">        map.placeEntry(0, 0);</span>
+<span class="fc" id="L350">        map.placeExit(2, 1);</span>
+<span class="fc" id="L351">        map.placePathPoint(1, 0);</span>
+<span class="fc" id="L352">        map.placePathPoint(1, 1);</span>
+<span class="fc" id="L353">        map.placePathPoint(2, 0);</span>
+        
+<span class="fc" id="L355">        String mapString = map.toString();</span>
+<span class="fc" id="L356">        assertNotNull(mapString);</span>
+<span class="fc" id="L357">        assertTrue(mapString.contains(&quot;\n&quot;));</span>
+<span class="fc" id="L358">    }</span>
+    
+    @Test
+    void testCornerArrayEdgeCases() {
+<span class="fc" id="L362">        map.setMapSize(10, 10);</span>
+        
+        // Test entry on right edge
+<span class="fc" id="L365">        Queue&lt;PathTile&gt; path = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L366">        path.add(new PathTile(9, 5));  // Entry at right edge</span>
+<span class="fc" id="L367">        path.add(new PathTile(5, 5));  // Middle point</span>
+        
+<span class="fc" id="L369">        int[][] cornerArray = map.cornerArray(path);</span>
+<span class="fc" id="L370">        assertEquals(10 * 32, cornerArray[0][0]); // x=9 is on right edge</span>
+        
+        // Test entry on top edge
+<span class="fc" id="L373">        path.clear();</span>
+<span class="fc" id="L374">        path.add(new PathTile(5, 0));  // Entry at top edge</span>
+<span class="fc" id="L375">        path.add(new PathTile(5, 5));  // Middle point</span>
+        
+<span class="fc" id="L377">        cornerArray = map.cornerArray(path);</span>
+<span class="fc" id="L378">        assertEquals(5 * 32 + 16, cornerArray[0][0]);</span>
+<span class="fc" id="L379">        assertEquals(0 * 32 + 16, cornerArray[0][1]);</span>
+<span class="fc" id="L380">    }</span>
+    
+    @Test
+    void testLinkTwoPointsSpecialCases() {
+<span class="fc" id="L384">        map.setMapSize(10, 10);</span>
+<span class="fc" id="L385">        map.initializeMap();</span>
+        
+        // Test when points are the same
+<span class="fc" id="L388">        PathTile start = new PathTile(5, 5);</span>
+<span class="fc" id="L389">        PathTile end = new PathTile(5, 5);</span>
+<span class="fc" id="L390">        map.placePathPoint(start.getX(), start.getY());</span>
+<span class="fc" id="L391">        map.linkTwoPoints(start, end);</span>
+        
+        // Check that the point exists
+<span class="fc" id="L394">        assertTrue(map.getTile(5, 5) instanceof PathTile);</span>
+<span class="fc" id="L395">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 25, 2025 2:18:13 AM)</div></body></html>

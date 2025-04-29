@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>MapBlackbox.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 28, 2025 8:22:47 PM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">test.blackbox</a> &gt; <span class="el_source">MapBlackbox.java</span></div><h1>MapBlackbox.java</h1><pre class="source lang-java linenums">package test.blackbox;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import map.*;
+import org.junit.jupiter.api.Test;
+
+<span class="fc" id="L8">class MapBlackbox {</span>
+
+    @Test
+    public void testSmallMapSize() {
+<span class="fc" id="L12">        SmallMap map = new SmallMap();</span>
+<span class="fc" id="L13">        assertEquals(12, map.getWidthOfMap());</span>
+<span class="fc" id="L14">        assertEquals(12, map.getHeightOfMap());</span>
+<span class="fc" id="L15">    }</span>
+
+    @Test
+    public void testMediumMapSize() {
+<span class="fc" id="L19">        MediumMap map = new MediumMap();</span>
+<span class="fc" id="L20">        assertEquals(15, map.getWidthOfMap());</span>
+<span class="fc" id="L21">        assertEquals(12, map.getHeightOfMap());</span>
+<span class="fc" id="L22">    }</span>
+
+    @Test
+    public void testMapPixelDimensions() {
+<span class="fc" id="L26">        SmallMap map = new SmallMap();</span>
+<span class="fc" id="L27">        assertEquals(12 * 32, map.getWidthInPixel());</span>
+<span class="fc" id="L28">        assertEquals(12 * 32, map.getHeightInPixel());</span>
+<span class="fc" id="L29">    }</span>
+
+    @Test
+    public void testMapEntryPointExists() {
+<span class="fc" id="L33">        SmallMap map = new SmallMap();</span>
+<span class="fc" id="L34">        assertNotNull(map.getEntry());</span>
+<span class="fc" id="L35">    }</span>
+
+    @Test
+    public void testMapEditorStoresValidInput() {
+<span class="fc" id="L39">        String input = &quot;(0,0) (0,1) (0,2)&quot;;</span>
+<span class="fc" id="L40">        MapEditor editor = new MapEditor(10, 10, input);</span>
+<span class="nc" id="L41">        assertEquals(10, editor.getWidthFromFile());</span>
+<span class="nc" id="L42">        assertEquals(10, editor.getHeightFromFile());</span>
+<span class="nc" id="L43">        assertEquals(input, editor.getUserInput());</span>
+<span class="nc" id="L44">    }</span>
+
+    @Test
+    public void testCornerArrayHasExpectedFormat() {
+<span class="fc" id="L48">        MediumMap map = new MediumMap();</span>
+<span class="fc" id="L49">        int[][] corners = map.getCornersList();</span>
+<span class="fc" id="L50">        assertNotNull(corners);</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        for (int[] corner : corners) {</span>
+<span class="fc" id="L52">            assertEquals(2, corner.length);</span>
+        }
+<span class="fc" id="L54">    }</span>
+
+    @Test
+    public void testToStringReturnsNonNull() {
+<span class="fc" id="L58">        SmallMap map = new SmallMap();</span>
+<span class="fc" id="L59">        assertNotNull(map.toString());</span>
+<span class="fc" id="L60">    }</span>
+
+    @Test
+    public void testMapEditorWithEmptyInput() {
+    	try {
+<span class="nc" id="L65">    		MapEditor editor = new MapEditor(5, 5, &quot;&quot;);</span>
+<span class="nc" id="L66">    		assertEquals(&quot;&quot;, editor.getUserInput());</span>
+<span class="nc" id="L67">            assertNotNull(editor.getUserInputFromFile());</span>
+<span class="pc" id="L68">    	} catch (Exception e) {</span>
+    		// Should throw some sort of exception
+    	}
+<span class="fc" id="L71">    }</span>
+
+    @Test
+    public void testMapEditorWithNullInput() {
+    	try {
+<span class="nc" id="L76">    		MapEditor editor = new MapEditor(5, 5, null);</span>
+<span class="nc" id="L77">    		assertNull(editor.getUserInput());</span>
+<span class="nc" id="L78">    		assertNotNull(editor.getUserInputFromFile());</span>
+<span class="pc" id="L79">    	} catch (Exception e) {</span>
+    		// Should throw exception
+    	}
+<span class="fc" id="L82">    }</span>
+
+    @Test
+    public void testMapEditorWithMalformedPath() {
+    	try {
+<span class="fc" id="L87">    		String input = &quot;(0,0) (not_a_coord) (5,5)&quot;;</span>
+<span class="nc" id="L88">    		MapEditor editor = new MapEditor(10, 10, input);</span>
+<span class="nc" id="L89">    		assertEquals(input, editor.getUserInput());</span>
+<span class="pc" id="L90">    	} catch (Exception e) {</span>
+    		//Should throw error
+    	}
+<span class="fc" id="L93">    }</span>
+
+    @Test
+    public void testEditorWithNegativeCoordinates() {
+    	try {
+<span class="fc" id="L98">    		String input = &quot;(-1,0) (0,-1)&quot;;</span>
+<span class="nc" id="L99">    		MapEditor editor = new MapEditor(5, 5, input);</span>
+<span class="nc" id="L100">    		assertTrue(editor.getUserInput().contains(&quot;-1&quot;));</span>
+<span class="pc" id="L101">    	} catch (Exception e) {</span>
+    		// Should throw error
+    	}
+<span class="fc" id="L104">    }</span>
+
+    @Test
+    public void testEditorWithOutOfBoundsCoordinates() {
+<span class="fc" id="L108">        String input = &quot;(100,100)&quot;;</span>
+<span class="fc" id="L109">        MapEditor editor = new MapEditor(5, 5, input);</span>
+<span class="fc" id="L110">        assertFalse(editor.getUserInput().contains(&quot;100&quot;)); // Should fail cause out of bounds</span>
+<span class="fc" id="L111">    }</span>
+
+    @Test
+    public void testZeroByZeroMap() {
+<span class="fc" id="L115">        MapEditor editor = new MapEditor(0, 0, &quot;(0,0)&quot;);</span>
+<span class="fc" id="L116">        assertEquals(0, editor.getWidthFromFile());</span>
+<span class="fc" id="L117">        assertEquals(0, editor.getHeightFromFile());</span>
+<span class="fc" id="L118">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 28, 2025 8:22:47 PM)</div></body></html>

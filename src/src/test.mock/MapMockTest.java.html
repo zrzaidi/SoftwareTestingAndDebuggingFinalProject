@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>MapMockTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 25, 2025 2:18:13 AM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">test.mock</a> &gt; <span class="el_source">MapMockTest.java</span></div><h1>MapMockTest.java</h1><pre class="source lang-java linenums">package test.mock;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import map.Map;
+import grid.PathTile;
+import grid.Tile;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.LinkedList;
+import java.util.Queue;
+
+<span class="fc" id="L16">public class MapMockTest {</span>
+
+    private Map testMap;
+
+    @BeforeEach
+    public void setup() {
+<span class="fc" id="L22">        testMap = new Map();</span>
+<span class="fc" id="L23">        testMap.setMapSize(5, 5);</span>
+<span class="fc" id="L24">        testMap.initializeMap();</span>
+<span class="fc" id="L25">    }</span>
+
+    @Test
+    public void testSetAndGetTile() {
+<span class="fc" id="L29">        Tile tile = testMap.getTile(2, 2);</span>
+<span class="fc" id="L30">        assertNotNull(tile, &quot;Tile at (2,2) should not be null&quot;);</span>
+<span class="fc" id="L31">    }</span>
+
+    @Test
+    public void testPlaceEntryAndExit() {
+<span class="fc" id="L35">        testMap.placeEntry(0, 0);</span>
+<span class="fc" id="L36">        testMap.placeExit(4, 4);</span>
+<span class="fc" id="L37">        assertEquals(2, testMap.getTile(0, 0).getType(), &quot;Entry tile type should be 2&quot;);</span>
+<span class="fc" id="L38">        assertEquals(3, testMap.getTile(4, 4).getType(), &quot;Exit tile type should be 3&quot;);</span>
+<span class="fc" id="L39">    }</span>
+
+    @Test
+    public void testPathBuildingAndConversion() {
+<span class="fc" id="L43">        Queue&lt;PathTile&gt; path = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L44">        path.add(new PathTile(0, 0));</span>
+<span class="fc" id="L45">        path.add(new PathTile(0, 1));</span>
+<span class="fc" id="L46">        path.add(new PathTile(0, 2));</span>
+<span class="fc" id="L47">        testMap.buildPath(path);</span>
+
+<span class="fc" id="L49">        assertEquals(2, testMap.getTile(0, 0).getType(), &quot;First tile should be entry&quot;);</span>
+<span class="fc" id="L50">        assertEquals(3, testMap.getTile(0, 2).getType(), &quot;Last tile should be exit&quot;);</span>
+<span class="fc" id="L51">        assertEquals(1, testMap.getTile(0, 1).getType(), &quot;Middle tile should be a path tile&quot;);</span>
+
+<span class="fc" id="L53">        int[][] binaryMap = testMap.convertToBinaryMap(testMap);</span>
+<span class="fc" id="L54">        assertEquals(2, binaryMap[0][0]);</span>
+<span class="fc" id="L55">        assertEquals(1, binaryMap[1][0]);</span>
+<span class="fc" id="L56">        assertEquals(3, binaryMap[2][0]);</span>
+<span class="fc" id="L57">    }</span>
+
+    @Test
+    public void testLinkTwoPointsHorizontal() {
+<span class="nc" id="L61">        testMap.linkTwoPoints(new PathTile(0, 1), new PathTile(3, 1));</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        for (int x = 0; x &lt;= 3; x++) {</span>
+<span class="nc" id="L63">            assertTrue(testMap.getTile(x, 1) instanceof PathTile, &quot;Tile should be a PathTile at (&quot; + x + &quot;,1)&quot;);</span>
+        }
+<span class="nc" id="L65">    }</span>
+
+    @Test
+    public void testLinkTwoPointsVertical() {
+<span class="nc" id="L69">        testMap.linkTwoPoints(new PathTile(2, 0), new PathTile(2, 3));</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">        for (int y = 0; y &lt;= 3; y++) {</span>
+<span class="nc" id="L71">            assertTrue(testMap.getTile(2, y) instanceof PathTile, &quot;Tile should be a PathTile at (2,&quot; + y + &quot;)&quot;);</span>
+        }
+<span class="nc" id="L73">    }</span>
+
+    @Test
+    public void testValidityOfMap() {
+<span class="fc" id="L77">        testMap.placeEntry(0, 0);</span>
+<span class="fc" id="L78">        testMap.placeExit(4, 4);</span>
+<span class="fc" id="L79">        assertTrue(testMap.ValidityOfMap(), &quot;Map with valid entry and exit should be valid&quot;);</span>
+<span class="fc" id="L80">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 25, 2025 2:18:13 AM)</div></body></html>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>CritterGenerator.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 28, 2025 8:22:47 PM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">critters</a> &gt; <span class="el_source">CritterGenerator.java</span></div><h1>CritterGenerator.java</h1><pre class="source lang-java linenums">package critters;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Queue;
+
+
+public class CritterGenerator {
+	
+<span class="fc" id="L10">	public CritterGenerator (int[][] pLocations,int pLevel){</span>
+<span class="fc" id="L11">		Locations = pLocations;</span>
+<span class="fc" id="L12">		this.level =pLevel-1;</span>
+<span class="fc" id="L13">	}</span>
+	
+	//The critter stream sets the type and quantity of each critter for each level. It can be easily adjusted
+<span class="fc" id="L16">	int[][] CritterStream = {		</span>
+<span class="fc" id="L17">			{2,1,0,0,0},</span>
+<span class="fc" id="L18">			{5,2,0,0,0},</span>
+<span class="fc" id="L19">			{6,2,1,0,0},</span>
+<span class="fc" id="L20">			{6,3,2,2,1},</span>
+<span class="fc" id="L21">			{6,3,3,3,1},</span>
+<span class="fc" id="L22">			{8,4,4,4,1},</span>
+<span class="fc" id="L23">			{9,5,5,5,2},</span>
+<span class="fc" id="L24">			{10,6,6,6,2},	</span>
+<span class="fc" id="L25">			{12,6,6,7,2},</span>
+<span class="fc" id="L26">			{15,6,8,8,2},</span>
+<span class="fc" id="L27">			{16,6,9,9,3},</span>
+<span class="fc" id="L28">			{20,8,10,10,3},</span>
+	
+							};
+	//automate critter list generation for 100 levels after hardcoded stream
+	public int[][] addCritterList(int lvlStart){
+<span class="fc" id="L33">		int[][] cListToAppend = new int[1000][5];</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">		for(int i=lvlStart;i&lt;1000+lvlStart;i++){</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">			for(int j=0;j&lt;5;j++){</span>
+<span class="fc" id="L36">				cListToAppend[i-lvlStart][j] = (i/3) + (4-j)*5;</span>
+			}
+		}
+<span class="fc" id="L39">		return cListToAppend;</span>
+	}
+
+	//creating  critter queue and finding starting point
+
+<span class="fc" id="L44">	private Queue&lt;Critter&gt; 		CritterQueue 	= new LinkedList&lt;Critter&gt;();</span>
+	private int 				level;
+	private int[][]				Locations;
+	
+
+	public void createCritterQueue(){
+		//for that level, create the critter objects as per the values in the critter stream and then randomize the queue 
+<span class="fc" id="L51">		int[][] critterStreamToAppend = addCritterList(CritterStream.length);</span>
+<span class="fc" id="L52">		int[][] fullCritterStream = new int[CritterStream.length+critterStreamToAppend.length][5];</span>
+
+		//concatenate two 2d arrays
+<span class="fc bfc" id="L55" title="All 2 branches covered.">		for(int i=0;i&lt;fullCritterStream.length;i++){</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">			if(i&lt;CritterStream.length){</span>
+<span class="fc" id="L57">				fullCritterStream[i]=CritterStream[i];</span>
+<span class="fc" id="L58">			}</span>
+			else{
+<span class="fc" id="L60">				fullCritterStream[i]=critterStreamToAppend[i-CritterStream.length];</span>
+			}
+		}
+<span class="fc bfc" id="L63" title="All 2 branches covered.">		for(int x = 0; x &lt; 5 ; x++)</span>
+		{
+<span class="fc bfc" id="L65" title="All 2 branches covered.">			for(int y = 0; y &lt; fullCritterStream[level][x] ; y++){	</span>
+
+<span class="fc" id="L67">				Critter c = addCritter(x);</span>
+<span class="fc" id="L68">				CritterQueue.add(c);</span>
+
+			}
+		}
+
+
+<span class="fc" id="L74">	}</span>
+	
+	
+	//shuffle the order of the critters
+	public void RandomizeCritterQueue()
+	{
+<span class="fc" id="L80">		Collections.shuffle((LinkedList&lt;Critter&gt;) CritterQueue);</span>
+<span class="fc" id="L81">	}</span>
+
+	//add the critters according to the input x, whose value is determined by the critterStream
+	private Critter addCritter(int x){
+<span class="fc bfc" id="L85" title="All 2 branches covered.">		if(x==0){</span>
+<span class="fc" id="L86">			Critter c = new GruntCritter(Locations);</span>
+<span class="fc" id="L87">			return c;</span>
+		}
+<span class="fc bfc" id="L89" title="All 2 branches covered.">		if(x==1){</span>
+<span class="fc" id="L90">			Critter c = new ScoutCritter(Locations);</span>
+<span class="fc" id="L91">			return c;</span>
+		}
+<span class="fc bfc" id="L93" title="All 2 branches covered.">		if(x==2){</span>
+<span class="fc" id="L94">			Critter c = new TankCritter(Locations);</span>
+<span class="fc" id="L95">			return c;</span>
+		}
+<span class="fc bfc" id="L97" title="All 2 branches covered.">		if(x==3){</span>
+<span class="fc" id="L98">			Critter c = new ArmoredCritter(Locations);</span>
+<span class="fc" id="L99">			return c;</span>
+		}
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">		if(x==4){</span>
+<span class="fc" id="L102">			Critter c = new BossCritter(Locations);</span>
+<span class="fc" id="L103">			return c;</span>
+		}
+
+<span class="nc" id="L106">		return null;</span>
+	}
+
+	//prints the critter queue to comnsole
+	public void printCritterQueue(){
+		
+<span class="fc" id="L112">		System.out.print(&quot;&lt;- [ &quot;);</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">		for(Critter s : CritterQueue){</span>
+<span class="fc" id="L114">			System.out.print(s.getName()+&quot; &quot;);</span>
+		}
+<span class="fc" id="L116">		System.out.println(&quot;]&quot;);</span>
+<span class="fc" id="L117">	}</span>
+
+
+	public Queue&lt;Critter&gt; getCritterQueue() {
+<span class="fc" id="L121">		return CritterQueue;</span>
+	}
+
+	
+	
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 28, 2025 8:22:47 PM)</div></body></html>

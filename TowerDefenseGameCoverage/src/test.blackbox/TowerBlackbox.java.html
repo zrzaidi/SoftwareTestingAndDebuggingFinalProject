@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>TowerBlackbox.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 28, 2025 8:22:47 PM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">test.blackbox</a> &gt; <span class="el_source">TowerBlackbox.java</span></div><h1>TowerBlackbox.java</h1><pre class="source lang-java linenums">package test.blackbox;
+
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+
+import towers.Tower;
+import critters.Critter;
+import game.Player;
+
+<span class="fc" id="L11">public class TowerBlackbox {</span>
+
+    private Tower mockTower;
+
+    @Before
+    public void setUp() {
+        // Create tower for testing
+<span class="fc" id="L18">        mockTower = new Tower(100, 200) {};</span>
+        
+        // Set necessary defaults
+<span class="fc" id="L21">        mockTower.setBuyingCost(100);</span>
+<span class="fc" id="L22">        mockTower.setRefundValue(50);</span>
+<span class="fc" id="L23">        mockTower.setRange(5.0);</span>
+<span class="fc" id="L24">        mockTower.setPower(10);</span>
+<span class="fc" id="L25">        mockTower.setUpgradeCost(30);</span>
+
+        // Ensure player has credits
+<span class="fc" id="L28">        Player.getPlayer().addCredits(100);</span>
+<span class="fc" id="L29">    }</span>
+
+    @Test
+    public void testBuyingCostSetterGetter() {
+<span class="fc" id="L33">        mockTower.setBuyingCost(150);</span>
+<span class="fc" id="L34">        assertEquals(150, mockTower.getBuyingCost());</span>
+<span class="fc" id="L35">    }</span>
+
+    @Test
+    public void testRefundValueSetterGetter() {
+<span class="fc" id="L39">        mockTower.setRefundValue(80);</span>
+<span class="fc" id="L40">        assertEquals(80.0, mockTower.getRefundValue(), 0.001);</span>
+<span class="fc" id="L41">    }</span>
+
+    @Test
+    public void testRangeModifier() {
+<span class="fc" id="L45">        mockTower.setRange(10);</span>
+        // Should return base range * modifier (level 1 → modifier = 1.0)
+<span class="fc" id="L47">        assertEquals(10.0, mockTower.getRange(), 0.001);</span>
+<span class="fc" id="L48">    }</span>
+
+    @Test
+    public void testPowerModifier() {
+<span class="fc" id="L52">        mockTower.setPower(20);</span>
+        // Should return base power * modifier (level 1 → modifier = 1.0)
+<span class="fc" id="L54">        assertEquals(20.0, mockTower.getPower(), 0.001);</span>
+<span class="fc" id="L55">    }</span>
+
+    @Test
+    public void testLevelAndUpgradeSuccess() {
+<span class="fc" id="L59">        Player.getPlayer().addCredits(100); // Ensure enough credits</span>
+
+<span class="fc" id="L61">        assertTrue(mockTower.upgrade()); // Level should now be 2</span>
+<span class="fc" id="L62">        assertEquals(2, mockTower.getLevel());</span>
+
+<span class="fc" id="L64">        assertTrue(mockTower.upgrade()); // Level should now be 3</span>
+<span class="fc" id="L65">        assertEquals(3, mockTower.getLevel());</span>
+
+        // Max level reached; upgrade should fail
+<span class="fc" id="L68">        assertFalse(mockTower.upgrade());</span>
+<span class="fc" id="L69">    }</span>
+
+    @Test
+    public void testUpgradeFailsWhenInsufficientCredits() {
+<span class="fc" id="L73">        Player.getPlayer().addCredits(-Player.getPlayer().getCredits()); // Set credits to 0</span>
+<span class="fc" id="L74">        assertFalse(mockTower.upgrade()); // Should not be able to upgrade</span>
+<span class="fc" id="L75">    }</span>
+
+    @Test
+    public void testRefundTowerAddsCredits() {
+<span class="fc" id="L79">        int initialCredits = Player.getPlayer().getCredits();</span>
+<span class="fc" id="L80">        mockTower.setRefundValue(70);</span>
+<span class="fc" id="L81">        mockTower.refundTower();</span>
+<span class="fc" id="L82">        assertEquals(initialCredits + 70, Player.getPlayer().getCredits());</span>
+<span class="fc" id="L83">    }</span>
+
+    @Test
+    public void testLocationGetters() {
+<span class="fc" id="L87">        assertEquals(100.0, mockTower.getXLoc(), 0.001);</span>
+<span class="fc" id="L88">        assertEquals(200.0, mockTower.getYLoc(), 0.001);</span>
+<span class="fc" id="L89">    }</span>
+
+    @Test
+    public void testCritterTravelDistance() {
+<span class="fc" id="L93">        mockTower.setCritterTravelDistanceMaximum(150.5);</span>
+<span class="fc" id="L94">        assertEquals(150.5, mockTower.getCritterTravelDistanceMaximum(), 0.001);</span>
+<span class="fc" id="L95">    }</span>
+
+    @Test
+    public void testGetTypeReturnsNullNoType() {
+<span class="fc" id="L99">        assertNull(mockTower.getType());</span>
+<span class="fc" id="L100">    }</span>
+
+    @Test
+    public void testIsFreezeTowerDefaultFalse() {
+<span class="fc" id="L104">        assertFalse(mockTower.isFreezeTower());</span>
+<span class="fc" id="L105">    }</span>
+
+    @Test
+    public void testGetModifierLevelOne() {
+        // Modifier should be 1.0 at level 1
+<span class="fc" id="L110">        assertEquals(1.0, mockTower.getModifier(), 0.001);</span>
+<span class="fc" id="L111">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 28, 2025 8:22:47 PM)</div></body></html>

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>GameBlackbox.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 28, 2025 8:22:47 PM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">test.blackbox</a> &gt; <span class="el_source">GameBlackbox.java</span></div><h1>GameBlackbox.java</h1><pre class="source lang-java linenums">package test.blackbox;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.*;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.state.StateBasedGame;
+
+import game.*;
+
+<span class="nc" id="L23">public class GameBlackbox {</span>
+
+    // MenuScreen Tests
+<span class="fc" id="L26">    public static class MenuScreenTests {</span>
+        private MenuScreen menu;
+
+        @Before
+        public void setUp() throws SlickException, NoSuchFieldException, IllegalAccessException {
+<span class="fc" id="L31">            menu = new MenuScreen(0);</span>
+
+<span class="fc" id="L33">            GameContainer container = mock(GameContainer.class);</span>
+<span class="fc" id="L34">            when(container.getWidth()).thenReturn(800);</span>
+<span class="fc" id="L35">            when(container.getHeight()).thenReturn(600);</span>
+
+<span class="fc" id="L37">            setPrivateField(menu, &quot;SandTileGraphic&quot;, mockImage(64, 64));</span>
+<span class="fc" id="L38">            setPrivateField(menu, &quot;StartGameButtonGraphic&quot;, mockImage(100, 40));</span>
+<span class="fc" id="L39">            setPrivateField(menu, &quot;EditMapButtonGraphic&quot;, mockImage(100, 40));</span>
+<span class="fc" id="L40">            setPrivateField(menu, &quot;TowerDefenseTitleGraphic&quot;, mockImage(200, 60));</span>
+<span class="fc" id="L41">            setPrivateField(menu, &quot;ExitButtonGraphic&quot;, mockImage(80, 30));</span>
+
+<span class="fc" id="L43">            menu.createRectangleButtons(container);</span>
+<span class="fc" id="L44">        }</span>
+
+        private Image mockImage(int width, int height) {
+<span class="fc" id="L47">            Image img = mock(Image.class);</span>
+<span class="fc" id="L48">            when(img.getWidth()).thenReturn(width);</span>
+<span class="fc" id="L49">            when(img.getHeight()).thenReturn(height);</span>
+<span class="fc" id="L50">            return img;</span>
+        }
+
+        private void setPrivateField(Object target, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {
+<span class="fc" id="L54">            Field field = target.getClass().getDeclaredField(fieldName);</span>
+<span class="fc" id="L55">            field.setAccessible(true);</span>
+<span class="fc" id="L56">            field.set(target, value);</span>
+<span class="fc" id="L57">        }</span>
+
+        @Test
+        public void testMouseClickOutsideButtonsDoesNothing() throws SlickException {
+<span class="fc" id="L61">            GameContainer container = mock(GameContainer.class);</span>
+<span class="fc" id="L62">            StateBasedGame sbg = mock(StateBasedGame.class);</span>
+<span class="fc" id="L63">            menu.mouseClicked(5, 5, sbg, container);</span>
+<span class="fc" id="L64">            verify(sbg, never()).enterState(anyInt());</span>
+<span class="fc" id="L65">        }</span>
+
+        @Test
+        public void testClickCooldownBlocksRapidClicks() throws Exception {
+<span class="fc" id="L69">            GameContainer container = mock(GameContainer.class);</span>
+<span class="fc" id="L70">            StateBasedGame sbg = mock(StateBasedGame.class);</span>
+<span class="fc" id="L71">            setPrivateField(menu, &quot;lastClick&quot;, System.currentTimeMillis());</span>
+<span class="fc" id="L72">            menu.mouseClicked(400, 300, sbg, container);</span>
+<span class="fc" id="L73">            verify(sbg, never()).enterState(anyInt());</span>
+<span class="fc" id="L74">        }</span>
+    }
+
+    // PlayScreen Tests
+<span class="fc" id="L78">    public static class PlayScreenTests {</span>
+        private PlayScreen playScreen;
+
+        @Before
+        public void setUp() {
+<span class="fc" id="L83">            playScreen = new PlayScreen(1);</span>
+<span class="fc" id="L84">        }</span>
+
+        private Object invokePrivateMethod(String methodName, Class&lt;?&gt;[] parameterTypes, Object[] parameters) throws Exception {
+<span class="fc" id="L87">            Method method = PlayScreen.class.getDeclaredMethod(methodName, parameterTypes);</span>
+<span class="fc" id="L88">            method.setAccessible(true);</span>
+<span class="fc" id="L89">            return method.invoke(playScreen, parameters);</span>
+        }
+
+        @Test
+        public void testDrawTowers() throws Exception {
+<span class="fc" id="L94">            Graphics graphics = mock(Graphics.class);</span>
+<span class="fc" id="L95">            invokePrivateMethod(&quot;drawTowers&quot;, new Class&lt;?&gt;[] { Graphics.class }, new Object[] { graphics });</span>
+<span class="fc" id="L96">            verify(graphics, times(0)).drawString(anyString(), anyFloat(), anyFloat()); // Adjust as needed</span>
+<span class="fc" id="L97">        }</span>
+    }
+
+    // EditMapScreen Tests
+<span class="fc" id="L101">    public static class EditMapScreenTests {</span>
+        private EditMapScreen editMapScreen;
+        private GameContainer container;
+        private StateBasedGame game;
+        
+        @Before
+        public void setUp() {
+<span class="fc" id="L108">            editMapScreen = new EditMapScreen(3);</span>
+<span class="fc" id="L109">            container = mock(GameContainer.class);</span>
+<span class="fc" id="L110">            game = mock(StateBasedGame.class);</span>
+<span class="fc" id="L111">            mock(Graphics.class);</span>
+<span class="fc" id="L112">        }</span>
+
+        @Test
+        public void testInitialState_mouseOnMapReturnsFalse() throws Exception {
+<span class="fc" id="L116">            Method method = EditMapScreen.class.getDeclaredMethod(&quot;mouseOnMap&quot;, int.class, int.class);</span>
+<span class="fc" id="L117">            method.setAccessible(true);</span>
+<span class="fc" id="L118">            boolean result = (boolean) method.invoke(editMapScreen, 10, 10);</span>
+<span class="fc" id="L119">            assertFalse(result);</span>
+<span class="fc" id="L120">        }</span>
+
+        @Test
+        public void testGetClosestTileCenter_returnsCorrectCenter() {
+<span class="fc" id="L124">            float result = editMapScreen.getClosestTileCenter(65f);</span>
+<span class="fc" id="L125">            assertEquals(80f, result);</span>
+<span class="fc" id="L126">        }</span>
+
+        @Test
+        public void testMapGridClicked_outOfBoundsClick() throws Exception {
+<span class="fc" id="L130">            Method mapGridClicked = EditMapScreen.class.getDeclaredMethod(</span>
+<span class="fc" id="L131">                &quot;mapGridClicked&quot;, int.class, int.class, StateBasedGame.class, GameContainer.class</span>
+            );
+<span class="fc" id="L133">            mapGridClicked.setAccessible(true);</span>
+<span class="fc" id="L134">            mapGridClicked.invoke(editMapScreen, 5, 5, game, container);</span>
+<span class="fc" id="L135">        }</span>
+    }
+
+    // Player Tests
+<span class="fc" id="L139">    public static class PlayerTests {</span>
+        private Player player;
+
+        @Before
+        public void setUp() {
+<span class="fc" id="L144">            player = Player.getPlayer();</span>
+<span class="fc" id="L145">            player.reset();</span>
+<span class="fc" id="L146">        }</span>
+
+        @Test
+        public void testInitialCredits() {
+<span class="fc" id="L150">            assertEquals(200, player.getCredits());</span>
+<span class="fc" id="L151">        }</span>
+
+        @Test
+        public void testInitialLives() {
+<span class="fc" id="L155">            assertEquals(16, player.getLives());</span>
+<span class="fc" id="L156">        }</span>
+
+        @Test
+        public void testAddCredits() {
+<span class="fc" id="L160">            player.addCredits(50);</span>
+<span class="fc" id="L161">            assertEquals(250, player.getCredits());</span>
+<span class="fc" id="L162">        }</span>
+
+        @Test
+        public void testAddLife() {
+<span class="fc" id="L166">            player.addLife();</span>
+<span class="fc" id="L167">            assertEquals(17, player.getLives());</span>
+<span class="fc" id="L168">        }</span>
+
+        @Test
+        public void testDecreaseLife() {
+<span class="fc" id="L172">            player.decreaseLife();</span>
+<span class="fc" id="L173">            assertEquals(15, player.getLives());</span>
+<span class="fc" id="L174">        }</span>
+
+        @Test
+        public void testReset() {
+<span class="fc" id="L178">            player.addCredits(50);</span>
+<span class="fc" id="L179">            player.addLife();</span>
+<span class="fc" id="L180">            player.reset();</span>
+<span class="fc" id="L181">            assertEquals(200, player.getCredits());</span>
+<span class="fc" id="L182">            assertEquals(16, player.getLives());</span>
+<span class="fc" id="L183">        }</span>
+
+        @Test
+        public void testSingletonInstance() {
+<span class="fc" id="L187">            Player player1 = Player.getPlayer();</span>
+<span class="fc" id="L188">            Player player2 = Player.getPlayer();</span>
+<span class="fc" id="L189">            assertSame(player1, player2);</span>
+<span class="fc" id="L190">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 28, 2025 8:22:47 PM)</div></body></html>

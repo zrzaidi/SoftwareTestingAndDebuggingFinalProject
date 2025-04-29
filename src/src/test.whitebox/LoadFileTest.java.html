@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>LoadFileTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 25, 2025 2:18:13 AM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">test.whitebox</a> &gt; <span class="el_source">LoadFileTest.java</span></div><h1>LoadFileTest.java</h1><pre class="source lang-java linenums">package test.whitebox;
+
+import static org.junit.Assert.*;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+<span class="fc" id="L16">public class LoadFileTest {</span>
+
+    private map.LoadFile loadFile;
+    private static final String TEST_FOLDER = &quot;mapSaves&quot;;
+    private File testDirectory;
+    
+    @Before
+    public void setUp() throws Exception {
+        // Create test directory if it doesn't exist
+<span class="fc" id="L25">        testDirectory = new File(TEST_FOLDER);</span>
+<span class="pc bpc" id="L26" title="1 of 2 branches missed.">        if (!testDirectory.exists()) {</span>
+<span class="nc" id="L27">            testDirectory.mkdir();</span>
+        }
+        
+        // Initialize LoadFile object
+<span class="fc" id="L31">        loadFile = new map.LoadFile();</span>
+<span class="fc" id="L32">    }</span>
+    
+    @After
+    public void tearDown() throws Exception {
+        // Clean up test files
+<span class="fc" id="L37">        File[] files = testDirectory.listFiles();</span>
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">        if (files != null) {</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">            for (File file : files) {</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">                if (file.getName().startsWith(&quot;test_&quot;)) {</span>
+<span class="fc" id="L41">                    file.delete();</span>
+                }
+            }
+        }
+<span class="fc" id="L45">    }</span>
+    
+    /**
+     * Helper method to set private fields in the LoadFile class
+     */
+    private void setPrivateField(Object target, String fieldName, Object value) throws Exception {
+<span class="fc" id="L51">        Field field = map.LoadFile.class.getDeclaredField(fieldName);</span>
+<span class="fc" id="L52">        field.setAccessible(true);</span>
+<span class="fc" id="L53">        field.set(target, value);</span>
+<span class="fc" id="L54">    }</span>
+    
+    /**
+     * Helper method to get private fields from the LoadFile class
+     */
+    private Object getPrivateField(Object target, String fieldName) throws Exception {
+<span class="nc" id="L60">        Field field = map.LoadFile.class.getDeclaredField(fieldName);</span>
+<span class="nc" id="L61">        field.setAccessible(true);</span>
+<span class="nc" id="L62">        return field.get(target);</span>
+    }
+    
+    /**
+     * Helper method to create a test map file
+     */
+    private File createTestMapFile(String name, int width, int height, String userInput, String mapData) throws IOException {
+<span class="fc" id="L69">        File file = new File(TEST_FOLDER + &quot;/&quot; + name + &quot;.txt&quot;);</span>
+<span class="fc" id="L70">        BufferedWriter writer = new BufferedWriter(new FileWriter(file));</span>
+<span class="fc" id="L71">        writer.write(String.valueOf(width));</span>
+<span class="fc" id="L72">        writer.newLine();</span>
+<span class="fc" id="L73">        writer.write(String.valueOf(height));</span>
+<span class="fc" id="L74">        writer.newLine();</span>
+<span class="fc" id="L75">        writer.write(userInput);</span>
+<span class="fc" id="L76">        writer.newLine();</span>
+<span class="fc" id="L77">        writer.write(mapData);</span>
+<span class="fc" id="L78">        writer.close();</span>
+<span class="fc" id="L79">        return file;</span>
+    }
+    
+    @Test
+    public void testConstructor() {
+        // Verify the constructor initializes the files list
+<span class="fc" id="L85">        assertNotNull(loadFile.getListofFiles());</span>
+<span class="fc" id="L86">    }</span>
+    
+    @Test
+    public void testListFilesForFolder() throws Exception {
+        // Create test files
+<span class="fc" id="L91">        createTestMapFile(&quot;test_map1&quot;, 10, 10, &quot;user input 1&quot;, &quot;map data 1&quot;);</span>
+<span class="fc" id="L92">        createTestMapFile(&quot;test_map2&quot;, 20, 20, &quot;user input 2&quot;, &quot;map data 2&quot;);</span>
+        
+        // Reset files list to ensure it's empty
+<span class="fc" id="L95">        setPrivateField(loadFile, &quot;files&quot;, new ArrayList&lt;String&gt;());</span>
+        
+        // Call the method
+<span class="fc" id="L98">        loadFile.listFilesforFolder();</span>
+        
+        // Verify results
+<span class="fc" id="L101">        ArrayList&lt;String&gt; files = loadFile.getListofFiles();</span>
+<span class="fc" id="L102">        assertTrue(&quot;File list should contain test_map1&quot;, files.contains(&quot;test_map1&quot;));</span>
+<span class="fc" id="L103">        assertTrue(&quot;File list should contain test_map2&quot;, files.contains(&quot;test_map2&quot;));</span>
+<span class="fc" id="L104">    }</span>
+    
+    @Test
+    public void testListFilesForFolder_WithNonTextFiles() throws Exception {
+        // Create a non-text file
+<span class="fc" id="L109">        File nonTextFile = new File(TEST_FOLDER + &quot;/test_other.dat&quot;);</span>
+<span class="fc" id="L110">        nonTextFile.createNewFile();</span>
+        
+        // Create a text file
+<span class="fc" id="L113">        createTestMapFile(&quot;test_map3&quot;, 10, 10, &quot;user input&quot;, &quot;map data&quot;);</span>
+        
+        // Reset files list to ensure it's empty
+<span class="fc" id="L116">        setPrivateField(loadFile, &quot;files&quot;, new ArrayList&lt;String&gt;());</span>
+        
+        // Call the method
+<span class="fc" id="L119">        loadFile.listFilesforFolder();</span>
+        
+        // Verify results
+<span class="fc" id="L122">        ArrayList&lt;String&gt; files = loadFile.getListofFiles();</span>
+<span class="fc" id="L123">        assertTrue(&quot;File list should contain test_map3&quot;, files.contains(&quot;test_map3&quot;));</span>
+<span class="fc" id="L124">        assertTrue(&quot;File list should contain test_other&quot;, files.contains(&quot;test_other&quot;));</span>
+        
+        // Clean up
+<span class="fc" id="L127">        nonTextFile.delete();</span>
+<span class="fc" id="L128">    }</span>
+    
+    @Test
+    public void testLoadFile() throws Exception {
+        // Create a test map file
+<span class="fc" id="L133">        createTestMapFile(&quot;test_map_load&quot;, 15, 25, &quot;sample input&quot;, &quot;sample map data&quot;);</span>
+        
+        // Initialize mapList
+<span class="fc" id="L136">        setPrivateField(loadFile, &quot;mapList&quot;, new ArrayList&lt;map.Map&gt;());</span>
+        
+        // Call the method
+<span class="nc" id="L139">        map.Map result = loadFile.loadFile(&quot;test_map_load&quot;);</span>
+        
+        // Verify results
+<span class="nc" id="L142">        assertNotNull(&quot;Loaded map should not be null&quot;, result);</span>
+<span class="nc" id="L143">        assertEquals(&quot;Width should be 15&quot;, 15, getPrivateField(loadFile, &quot;width&quot;));</span>
+<span class="nc" id="L144">        assertEquals(&quot;Height should be 25&quot;, 25, getPrivateField(loadFile, &quot;height&quot;));</span>
+<span class="nc" id="L145">        assertEquals(&quot;User input should match&quot;, &quot;sample input&quot;, getPrivateField(loadFile, &quot;userInput&quot;));</span>
+<span class="nc" id="L146">        assertTrue(&quot;Map info should contain sample map data&quot;, </span>
+<span class="nc" id="L147">                ((String)getPrivateField(loadFile, &quot;mapInfo&quot;)).contains(&quot;sample map data&quot;));</span>
+<span class="nc" id="L148">    }</span>
+    
+    @Test(expected = IOException.class)
+    public void testLoadFile_FileNotFound() throws Exception {
+        // Call with non-existent file should throw IOException
+<span class="nc" id="L153">        loadFile.loadFile(&quot;non_existent_file&quot;);</span>
+<span class="nc" id="L154">    }</span>
+    
+    @Test
+    public void testLoadFile_EmptyFile() throws Exception {
+        // Create an empty file
+<span class="fc" id="L159">        File emptyFile = new File(TEST_FOLDER + &quot;/test_empty.txt&quot;);</span>
+<span class="fc" id="L160">        emptyFile.createNewFile();</span>
+        
+        // Initialize mapList
+<span class="fc" id="L163">        setPrivateField(loadFile, &quot;mapList&quot;, new ArrayList&lt;map.Map&gt;());</span>
+        
+        try {
+            // This should throw a NumberFormatException or similar when trying to parse width
+<span class="nc" id="L167">            loadFile.loadFile(&quot;test_empty&quot;);</span>
+<span class="nc" id="L168">            fail(&quot;Should have thrown an exception for empty file&quot;);</span>
+<span class="pc" id="L169">        } catch (Exception e) {</span>
+            // Expected exception
+        } finally {
+            // Clean up
+<span class="fc" id="L173">            emptyFile.delete();</span>
+        }
+<span class="fc" id="L175">    }</span>
+    
+    @Test
+    public void testGetAllMap() throws Exception {
+        // Create test files
+<span class="fc" id="L180">        createTestMapFile(&quot;test_all_map1&quot;, 10, 10, &quot;input 1&quot;, &quot;data 1&quot;);</span>
+<span class="fc" id="L181">        createTestMapFile(&quot;test_all_map2&quot;, 20, 20, &quot;input 2&quot;, &quot;data 2&quot;);</span>
+        
+        // Reset files list
+<span class="fc" id="L184">        ArrayList&lt;String&gt; filesList = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L185">        filesList.add(&quot;test_all_map1&quot;);</span>
+<span class="fc" id="L186">        filesList.add(&quot;test_all_map2&quot;);</span>
+<span class="fc" id="L187">        setPrivateField(loadFile, &quot;files&quot;, filesList);</span>
+        
+        // Initialize mapList
+<span class="fc" id="L190">        setPrivateField(loadFile, &quot;mapList&quot;, new ArrayList&lt;map.Map&gt;());</span>
+        
+        // Call the method
+<span class="nc" id="L193">        ArrayList&lt;map.Map&gt; result = loadFile.getAllMap();</span>
+        
+        // Verify results
+<span class="nc" id="L196">        assertEquals(&quot;Should have loaded 2 maps&quot;, 2, result.size());</span>
+<span class="nc" id="L197">        assertNotNull(&quot;First map should not be null&quot;, result.get(0));</span>
+<span class="nc" id="L198">        assertNotNull(&quot;Second map should not be null&quot;, result.get(1));</span>
+<span class="nc" id="L199">    }</span>
+    
+    @Test
+    public void testGetAllMap_WithInvalidFile() throws Exception {
+        // Create one valid and one invalid file
+<span class="fc" id="L204">        createTestMapFile(&quot;test_valid&quot;, 10, 10, &quot;input&quot;, &quot;data&quot;);</span>
+        
+        // Create an invalid file (missing required data)
+<span class="fc" id="L207">        File invalidFile = new File(TEST_FOLDER + &quot;/test_invalid.txt&quot;);</span>
+<span class="fc" id="L208">        BufferedWriter writer = new BufferedWriter(new FileWriter(invalidFile));</span>
+<span class="fc" id="L209">        writer.write(&quot;not enough data&quot;);</span>
+<span class="fc" id="L210">        writer.close();</span>
+        
+        // Reset files list
+<span class="fc" id="L213">        ArrayList&lt;String&gt; filesList = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L214">        filesList.add(&quot;test_valid&quot;);</span>
+<span class="fc" id="L215">        filesList.add(&quot;test_invalid&quot;);</span>
+<span class="fc" id="L216">        setPrivateField(loadFile, &quot;files&quot;, filesList);</span>
+        
+        // Initialize mapList
+<span class="fc" id="L219">        setPrivateField(loadFile, &quot;mapList&quot;, new ArrayList&lt;map.Map&gt;());</span>
+        
+        // Call the method
+<span class="nc" id="L222">        ArrayList&lt;map.Map&gt; result = loadFile.getAllMap();</span>
+        
+        // Verify results - should still have the valid map
+<span class="nc" id="L225">        assertEquals(&quot;Should have loaded 1 map&quot;, 1, result.size());</span>
+<span class="nc" id="L226">        assertNotNull(&quot;First map should not be null&quot;, result.get(0));</span>
+<span class="nc" id="L227">    }</span>
+    
+    @Test
+    public void testCreateMap() throws Exception {
+        // Setup field values
+<span class="fc" id="L232">        setPrivateField(loadFile, &quot;width&quot;, 30);</span>
+<span class="fc" id="L233">        setPrivateField(loadFile, &quot;height&quot;, 40);</span>
+<span class="fc" id="L234">        setPrivateField(loadFile, &quot;userInput&quot;, &quot;test input&quot;);</span>
+        
+        // Call the method
+<span class="nc" id="L237">        map.Map result = loadFile.createMap();</span>
+        
+        // Verify results
+<span class="nc" id="L240">        assertNotNull(&quot;Created map should not be null&quot;, result);</span>
+<span class="nc" id="L241">    }</span>
+    
+    @Test
+    public void testGetListofFiles() throws Exception {
+        // Create test files
+<span class="fc" id="L246">        createTestMapFile(&quot;test_file_list1&quot;, 10, 10, &quot;input&quot;, &quot;data&quot;);</span>
+<span class="fc" id="L247">        createTestMapFile(&quot;test_file_list2&quot;, 20, 20, &quot;input&quot;, &quot;data&quot;);</span>
+        
+        // Reset and update files list
+<span class="fc" id="L250">        loadFile.listFilesforFolder();</span>
+        
+        // Call the method
+<span class="fc" id="L253">        ArrayList&lt;String&gt; result = loadFile.getListofFiles();</span>
+        
+        // Verify results
+<span class="fc" id="L256">        assertNotNull(&quot;File list should not be null&quot;, result);</span>
+<span class="fc" id="L257">        assertTrue(&quot;File list should contain test_file_list1&quot;, result.contains(&quot;test_file_list1&quot;));</span>
+<span class="fc" id="L258">        assertTrue(&quot;File list should contain test_file_list2&quot;, result.contains(&quot;test_file_list2&quot;));</span>
+<span class="fc" id="L259">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 25, 2025 2:18:13 AM)</div></body></html>

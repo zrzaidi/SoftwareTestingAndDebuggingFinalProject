@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>BossCritterTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 25, 2025 2:18:13 AM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">test.whitebox</a> &gt; <span class="el_source">BossCritterTest.java</span></div><h1>BossCritterTest.java</h1><pre class="source lang-java linenums">package test.whitebox;
+
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+
+import org.junit.jupiter.api.Test;
+
+<span class="fc" id="L8">class BossCritterTest {</span>
+
+
+    private critters.BossCritter boss;
+<span class="fc" id="L12">    private int[][] path = {</span>
+<span class="fc" id="L13">        {0, 0}, {10, 0}, {10, 10}</span>
+    };
+
+    @BeforeEach
+    void setUp() {
+<span class="fc" id="L18">        boss = new critters.BossCritter(path);</span>
+<span class="fc" id="L19">    }</span>
+
+    // === Constructor property tests ===
+    @Test
+    void testNameIsBoss() {
+<span class="fc" id="L24">        assertEquals(&quot;Boss&quot;, boss.getName());</span>
+<span class="fc" id="L25">    }</span>
+
+    @Test
+    void testHealthIs15() {
+<span class="fc" id="L29">        assertEquals(15.0, boss.getHealth());</span>
+<span class="fc" id="L30">    }</span>
+
+    @Test
+    void testSpeedIs0Point5() {
+<span class="fc" id="L34">        assertEquals(0.5, boss.getSpeed());</span>
+<span class="fc" id="L35">    }</span>
+
+    @Test
+    void testRewardIs100() {
+<span class="fc" id="L39">        assertEquals(100, boss.getReward());</span>
+<span class="fc" id="L40">    }</span>
+
+    @Test
+    void testTypeIsBoss() {
+<span class="fc" id="L44">        assertEquals(critters.Critter.type.BOSS, boss.getType());</span>
+<span class="fc" id="L45">    }</span>
+
+    @Test
+    void testIsInitiallyAlive() {
+<span class="fc" id="L49">        assertTrue(boss.isAlive());</span>
+<span class="fc" id="L50">    }</span>
+
+    @Test
+    void testIsNotAtEndInitially() {
+<span class="fc" id="L54">        assertFalse(boss.isAtEndPoint());</span>
+<span class="fc" id="L55">    }</span>
+
+    // === Movement tests ===
+    @Test
+    void testMoveIncreasesXLoc() {
+<span class="fc" id="L60">        float initialX = boss.getXLoc();</span>
+<span class="fc" id="L61">        boss.move();</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">        assertTrue(boss.getXLoc() &gt; initialX);</span>
+<span class="fc" id="L63">    }</span>
+
+    @Test
+    void testDirectionIsRightAfterMove() {
+<span class="fc" id="L67">        boss.move();</span>
+<span class="fc" id="L68">        assertEquals(critters.Critter.direction.RIGHT, boss.getCritterDirection());</span>
+<span class="fc" id="L69">    }</span>
+
+    @Test
+    void testMoveUntilEndPointReached() {
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        while (!boss.isAtEndPoint()) {</span>
+<span class="fc" id="L74">            boss.move();</span>
+        }
+<span class="fc" id="L76">        assertTrue(boss.isAtEndPoint());</span>
+<span class="fc" id="L77">    }</span>
+
+    @Test
+    void testMoveUntilEndPointThenInvisible() {
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        while (!boss.isAtEndPoint()) {</span>
+<span class="fc" id="L82">            boss.move();</span>
+        }
+<span class="fc" id="L84">        assertFalse(boss.isVisible());</span>
+<span class="fc" id="L85">    }</span>
+
+    // === Freeze logic tests ===
+    @Test
+    void testFreezeReducesSpeed() {
+<span class="fc" id="L90">        double originalSpeed = boss.getSpeed();</span>
+<span class="fc" id="L91">        boss.freezeCritter();</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        assertTrue(boss.getSpeed() &lt; originalSpeed);</span>
+<span class="fc" id="L93">    }</span>
+
+    @Test
+    void testUnfreezeRestoresSpeed() throws InterruptedException {
+<span class="fc" id="L97">        double originalSpeed = boss.getSpeed();</span>
+<span class="fc" id="L98">        boss.freezeCritter();</span>
+<span class="fc" id="L99">        Thread.sleep(4100);</span>
+<span class="fc" id="L100">        boss.move();  // triggers unfreeze</span>
+<span class="fc" id="L101">        assertEquals(originalSpeed, boss.getSpeed(), 0.01);</span>
+<span class="fc" id="L102">    }</span>
+
+    @Test
+    void testFreezeDurationCanBeChanged() throws InterruptedException {
+<span class="fc" id="L106">        boss.setFreezeDuration(100);  // very short</span>
+<span class="fc" id="L107">        boss.freezeCritter();</span>
+<span class="fc" id="L108">        Thread.sleep(150);</span>
+<span class="fc" id="L109">        boss.move(); // should unfreeze</span>
+<span class="fc" id="L110">        assertEquals(0.5, boss.getSpeed(), 0.01);</span>
+<span class="fc" id="L111">    }</span>
+
+    // === Damage logic tests ===
+    @Test
+    void testLethalDamageMakesBossDead() {
+<span class="fc" id="L116">        boss.takeDamage(200); // 200/8 = 25 &gt; 15</span>
+<span class="fc" id="L117">        assertFalse(boss.isAlive());</span>
+<span class="fc" id="L118">    }</span>
+
+    @Test
+    void testLethalDamageMakesBossInvisible() {
+<span class="fc" id="L122">        boss.takeDamage(200);</span>
+<span class="fc" id="L123">        assertFalse(boss.isVisible());</span>
+<span class="fc" id="L124">    }</span>
+
+    @Test
+    void testNonLethalDamageReducesHealth() {
+<span class="fc" id="L128">        boss.takeDamage(8); // 8/8 = 1</span>
+<span class="fc" id="L129">        assertEquals(14.0, boss.getHealth());</span>
+<span class="fc" id="L130">    }</span>
+
+    @Test
+    void testTakeZeroDamageDoesNotChangeHealth() {
+<span class="fc" id="L134">        double before = boss.getHealth();</span>
+<span class="fc" id="L135">        boss.takeDamage(0);</span>
+<span class="fc" id="L136">        assertEquals(before, boss.getHealth());</span>
+<span class="fc" id="L137">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 25, 2025 2:18:13 AM)</div></body></html>

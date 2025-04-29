@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>Tower.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">Merged (Apr 28, 2025 8:22:47 PM)</a> &gt; <a href="../../index.html" class="el_group">TowerDefenseGame</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">towers</a> &gt; <span class="el_source">Tower.java</span></div><h1>Tower.java</h1><pre class="source lang-java linenums">package towers;
+
+import critters.Critter;
+import game.Player;
+
+public abstract class Tower {	
+	
+<span class="fc" id="L8">	public enum type{</span>
+<span class="fc" id="L9">		FREEZE, SNIPER, GENERIC</span>
+	}
+	protected int buyingCost;
+<span class="fc" id="L12">	private double modifierBase = 1.0;		//base multiplier for upgrades</span>
+<span class="fc" id="L13">	private double modifierIncrease = 1.2;	//how much range and attack increase by when upgraded</span>
+	protected int refundValue;
+	protected double range;
+	protected double power ;
+<span class="fc" id="L17">	private int level =1;</span>
+<span class="fc" id="L18">	private static int maxLevel = 3;</span>
+	protected int upgradeCost;
+	private double xPos;
+	private double yPos;
+<span class="fc" id="L22">	protected boolean freezeTower = false;</span>
+	private Critter targetCritter;
+	protected double reloadTime;
+	private long lastAttackTime;
+	private double angleOfRotation;
+	protected type towerType;
+<span class="fc" id="L28">	private double critterTravelDistanceMaximum =0;</span>
+	//system time of last attack
+
+	
+	
+<span class="fc" id="L33">	public Tower(double xPos, double yPos){</span>
+<span class="fc" id="L34">		this.xPos = xPos;</span>
+<span class="fc" id="L35">		this.yPos = yPos;</span>
+<span class="fc" id="L36">		this.lastAttackTime = 0;</span>
+<span class="fc" id="L37">		angleOfRotation = 0;</span>
+<span class="fc" id="L38">		lastAttackTime = 0;</span>
+<span class="fc" id="L39">	}</span>
+	
+	
+	public boolean canAttack(){
+<span class="fc bfc" id="L43" title="All 2 branches covered.">		if( (System.currentTimeMillis()-lastAttackTime)/1000.0 &gt;= reloadTime){</span>
+
+<span class="fc" id="L45">			return true;</span>
+		}
+		else
+<span class="fc" id="L48">			return false;</span>
+	}
+
+	public void refundTower() { // credit of this tower's salvage value
+											// is added to the user's account.
+<span class="fc" id="L53">		Player.getPlayer().addCredits(refundValue);</span>
+<span class="fc" id="L54">	}</span>
+
+	public int getBuyingCost() { // getters and setters for the private
+									// attributes of this object.
+<span class="fc" id="L58">		return buyingCost;</span>
+	}
+
+	public void setBuyingCost(int pBuyingCost) {
+<span class="fc" id="L62">		buyingCost = pBuyingCost;</span>
+<span class="fc" id="L63">	}</span>
+
+	public double getRefundValue() {
+<span class="fc" id="L66">		return refundValue;</span>
+	}
+
+	public void setRefundValue(int pRefundValue) {
+<span class="fc" id="L70">		refundValue = pRefundValue;</span>
+<span class="fc" id="L71">	}</span>
+
+	public void setTargetCritter(Critter c){
+<span class="nc" id="L74">		targetCritter = c;</span>
+<span class="nc" id="L75">	}</span>
+	public Critter getTargetCritter(){
+<span class="nc" id="L77">		return targetCritter;</span>
+	}
+	
+	
+	
+	public double getCritterTravelDistanceMaximum() {
+<span class="fc" id="L83">		return critterTravelDistanceMaximum;</span>
+	}
+
+
+	public void setCritterTravelDistanceMaximum(double critterTravelDistanceMaximum) {
+<span class="fc" id="L88">		this.critterTravelDistanceMaximum = critterTravelDistanceMaximum;</span>
+<span class="fc" id="L89">	}</span>
+
+
+	public double getRotationAngleInDegrees(){
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">		if(targetCritter !=null)</span>
+<span class="nc" id="L94">			angleOfRotation = (180/Math.PI)*Math.atan2(targetCritter.getYLoc()-yPos, targetCritter.getXLoc()-xPos);</span>
+<span class="fc" id="L95">		return angleOfRotation;</span>
+	}
+	
+	public double getRange() {
+<span class="fc" id="L99">		return (range*getModifier());</span>
+	}
+
+	public void setRange(double pRange) {
+<span class="fc" id="L103">		range = pRange;</span>
+<span class="fc" id="L104">	}</span>
+
+	public double getPower() {
+<span class="fc" id="L107">		return power*getModifier();</span>
+	}
+
+	public void setPower(int pPower) {
+<span class="fc" id="L111">		power = pPower;</span>
+<span class="fc" id="L112">	}</span>
+
+	public int getLevel() {
+<span class="fc" id="L115">		return level;</span>
+	}
+//returns if upgrade was successful
+	public boolean upgrade() {
+<span class="fc bfc" id="L119" title="All 4 branches covered.">		if(level &lt; maxLevel &amp;&amp; Player.getPlayer().getCredits()&gt;=upgradeCost){</span>
+<span class="fc" id="L120">			level++;</span>
+<span class="fc" id="L121">			Player.getPlayer().addCredits(-1*upgradeCost);</span>
+<span class="fc" id="L122">			return true;</span>
+		}
+<span class="fc" id="L124">		return false;</span>
+	}
+
+	public double getUpgradeCost() {
+<span class="fc" id="L128">		return upgradeCost;</span>
+	}
+
+	public void setUpgradeCost(int pUpgradeCost) {
+<span class="fc" id="L132">		upgradeCost = pUpgradeCost;</span>
+<span class="fc" id="L133">	}</span>
+	
+	public double getXLoc(){
+<span class="fc" id="L136">		return xPos;</span>
+	}
+	
+	public double getYLoc(){
+<span class="fc" id="L140">		return yPos;</span>
+	}
+	
+	public boolean isFreezeTower(){
+<span class="fc" id="L144">		return freezeTower;</span>
+	}
+	
+
+	public void setTimeOfLastAttack(long time){
+
+<span class="fc" id="L150">		lastAttackTime = time;</span>
+<span class="fc" id="L151">	}</span>
+	
+	public type getType(){
+<span class="fc" id="L154">		return this.towerType;</span>
+	}
+	
+	public double getModifier(){
+<span class="fc" id="L158">		return (modifierBase + ((level-1)*modifierIncrease));</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Merged (Apr 28, 2025 8:22:47 PM)</div></body></html>
